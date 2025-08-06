@@ -311,12 +311,12 @@
                         <!-- AI Species Recognition Section -->
                         <div class="card mb-4 border-danger">
                             <div class="card-header bg-danger text-white">
-                                <h5 class="mb-0"><i class="bx bx-brain me-2"></i>🤖 AI SPECIES RECOGNITION & SIZE ESTIMATION</h5>
+                                <h5 class="mb-0"><i class="bx bx-brain me-2"></i> SPECIES RECOGNITION & SIZE ESTIMATION</h5>
                             </div>
                             <div class="card-body">
                                 <!-- AI Models Information -->
                                 <div class="alert alert-info mb-4">
-                                    <h6 class="alert-heading"><i class="bx bx-chip me-2"></i>AI Models Used:</h6>
+                                    <h6 class="alert-heading"><i class="bx bx-chip me-2"></i>ML Models Used:</h6>
                                     <ul class="mb-0">
                                         <li><strong>Species Recognition:</strong> CNN + MobileNetV2 (TensorFlow/Keras)</li>
                                         <li><strong>Object Detection:</strong> YOLOv8 (Ultralytics)</li>

@@ -23,31 +23,187 @@ CORS(app)  # Enable CORS for all routes
 species_model = None
 yolo_model = None
 
-# Fish species database
+# Fish species database with comprehensive information
 FISH_SPECIES = {
-    "Tilapia": {
-        "scientific_name": "Oreochromis niloticus",
-        "common_names": ["Nile Tilapia", "Tilapia"],
-        "weight_formula": "W = 0.0001 * L^3.2",  # Weight in grams, Length in cm
-        "legal_size_cm": 10.0
-    },
     "Bangus": {
         "scientific_name": "Chanos chanos",
         "common_names": ["Milkfish", "Bangus"],
         "weight_formula": "W = 0.00008 * L^3.1",
         "legal_size_cm": 15.0
     },
-    "Tuna": {
-        "scientific_name": "Thunnus albacares",
-        "common_names": ["Yellowfin Tuna", "Tuna"],
-        "weight_formula": "W = 0.00012 * L^3.0",
+    "Big Head Carp": {
+        "scientific_name": "Hypophthalmichthys nobilis",
+        "common_names": ["Bighead Carp"],
+        "weight_formula": "W = 0.0001 * L^3.1",
         "legal_size_cm": 20.0
     },
-    "Galunggong": {
-        "scientific_name": "Decapterus macarellus",
-        "common_names": ["Mackerel Scad", "Galunggong"],
-        "weight_formula": "W = 0.00009 * L^3.1",
+    "Black Spotted Barb": {
+        "scientific_name": "Puntius filamentosus",
+        "common_names": ["Black Spotted Barb"],
+        "weight_formula": "W = 0.00009 * L^3.0",
+        "legal_size_cm": 8.0
+    },
+    "Catfish": {
+        "scientific_name": "Clarias batrachus",
+        "common_names": ["Walking Catfish"],
+        "weight_formula": "W = 0.00012 * L^3.0",
+        "legal_size_cm": 15.0
+    },
+    "Climbing Perch": {
+        "scientific_name": "Anabas testudineus",
+        "common_names": ["Climbing Perch"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 10.0
+    },
+    "Fourfinger Threadfin": {
+        "scientific_name": "Eleutheronema tetradactylum",
+        "common_names": ["Fourfinger Threadfin"],
+        "weight_formula": "W = 0.00009 * L^3.0",
+        "legal_size_cm": 18.0
+    },
+    "Freshwater Eel": {
+        "scientific_name": "Anguilla marmorata",
+        "common_names": ["Giant Mottled Eel"],
+        "weight_formula": "W = 0.00015 * L^2.8",
+        "legal_size_cm": 30.0
+    },
+    "Glass Perchlet": {
+        "scientific_name": "Parambassis ranga",
+        "common_names": ["Indian Glassy Fish"],
+        "weight_formula": "W = 0.00005 * L^3.0",
+        "legal_size_cm": 5.0
+    },
+    "Goby": {
+        "scientific_name": "Glossogobius giuris",
+        "common_names": ["Tank Goby"],
+        "weight_formula": "W = 0.00007 * L^3.0",
+        "legal_size_cm": 8.0
+    },
+    "Gold Fish": {
+        "scientific_name": "Carassius auratus",
+        "common_names": ["Goldfish"],
+        "weight_formula": "W = 0.00008 * L^3.0",
+        "legal_size_cm": 10.0
+    },
+    "Grass Carp": {
+        "scientific_name": "Ctenopharyngodon idella",
+        "common_names": ["Grass Carp"],
+        "weight_formula": "W = 0.00012 * L^3.1",
+        "legal_size_cm": 25.0
+    },
+    "Green Spotted Puffer": {
+        "scientific_name": "Dichotomyctere nigroviridis",
+        "common_names": ["Spotted Green Pufferfish"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 8.0
+    },
+    "Indian Carp": {
+        "scientific_name": "Cirrhinus mrigala",
+        "common_names": ["Mrigal"],
+        "weight_formula": "W = 0.0001 * L^3.1",
+        "legal_size_cm": 20.0
+    },
+    "Indo-Pacific Tarpon": {
+        "scientific_name": "Megalops cyprinoides",
+        "common_names": ["Oxeye Herring"],
+        "weight_formula": "W = 0.00015 * L^2.9",
+        "legal_size_cm": 25.0
+    },
+    "Jaguar Gapote": {
+        "scientific_name": "Parachromis managuensis",
+        "common_names": ["Jaguar Cichlid"],
+        "weight_formula": "W = 0.00012 * L^3.0",
+        "legal_size_cm": 15.0
+    },
+    "Janitor Fish": {
+        "scientific_name": "Pterygoplichthys pardalis",
+        "common_names": ["Common Pleco"],
+        "weight_formula": "W = 0.00015 * L^3.0",
+        "legal_size_cm": 20.0
+    },
+    "Knifefish": {
+        "scientific_name": "Chitala ornata",
+        "common_names": ["Clown Knifefish"],
+        "weight_formula": "W = 0.00013 * L^3.0",
+        "legal_size_cm": 25.0
+    },
+    "Long-Snouted Pipefish": {
+        "scientific_name": "Doryichthys martensii",
+        "common_names": ["Long-snouted Pipefish"],
+        "weight_formula": "W = 0.00005 * L^3.0",
+        "legal_size_cm": 8.0
+    },
+    "Mosquito Fish": {
+        "scientific_name": "Gambusia affinis",
+        "common_names": ["Mosquitofish"],
+        "weight_formula": "W = 0.00003 * L^3.0",
+        "legal_size_cm": 3.0
+    },
+    "Mudfish": {
+        "scientific_name": "Channa striata",
+        "common_names": ["Striped Snakehead"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 15.0
+    },
+    "Mullet": {
+        "scientific_name": "Mugil cephalus",
+        "common_names": ["Flathead Mullet"],
+        "weight_formula": "W = 0.00009 * L^3.0",
+        "legal_size_cm": 20.0
+    },
+    "Pangasius": {
+        "scientific_name": "Pangasius hypophthalmus",
+        "common_names": ["Iridescent Shark"],
+        "weight_formula": "W = 0.00012 * L^3.1",
+        "legal_size_cm": 25.0
+    },
+    "Perch": {
+        "scientific_name": "Anabas testudineus",
+        "common_names": ["Climbing Perch"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 10.0
+    },
+    "Scat Fish": {
+        "scientific_name": "Scatophagus argus",
+        "common_names": ["Spotted Scat"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 10.0
+    },
+    "Silver Barb": {
+        "scientific_name": "Barbonymus gonionotus",
+        "common_names": ["Java Barb"],
+        "weight_formula": "W = 0.00009 * L^3.0",
+        "legal_size_cm": 10.0
+    },
+    "Silver Carp": {
+        "scientific_name": "Hypophthalmichthys molitrix",
+        "common_names": ["Silver Carp"],
+        "weight_formula": "W = 0.00011 * L^3.1",
+        "legal_size_cm": 20.0
+    },
+    "Silver Perch": {
+        "scientific_name": "Bidyanus bidyanus",
+        "common_names": ["Silver Perch"],
+        "weight_formula": "W = 0.0001 * L^3.0",
         "legal_size_cm": 12.0
+    },
+    "Snakehead": {
+        "scientific_name": "Channa striata",
+        "common_names": ["Striped Snakehead"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 15.0
+    },
+    "Tenpounder": {
+        "scientific_name": "Elops hawaiensis",
+        "common_names": ["Hawaiian Ladyfish"],
+        "weight_formula": "W = 0.0001 * L^3.0",
+        "legal_size_cm": 20.0
+    },
+    "Tilapia": {
+        "scientific_name": "Oreochromis niloticus",
+        "common_names": ["Nile Tilapia"],
+        "weight_formula": "W = 0.0001 * L^3.2",
+        "legal_size_cm": 10.0
     },
     "Tamban": {
         "scientific_name": "Sardinella spp.",
@@ -71,30 +227,43 @@ FISH_SPECIES = {
 
 def load_models():
     """Load ML models with error handling"""
-    global species_model, yolo_model
+    global species_model, yolo_model, class_mapping
+    
+    # Load class mapping
+    class_mapping = {}
+    try:
+        mapping_path = os.path.join(os.path.dirname(__file__), 'models/class_mapping.json')
+        if os.path.exists(mapping_path):
+            with open(mapping_path, 'r') as f:
+                class_mapping = json.load(f)
+            logger.info(f"Loaded class mapping with {len(class_mapping)} classes")
+    except Exception as e:
+        logger.error(f"Error loading class mapping: {e}")
     
     try:
-        # Load CNN + MobileNetV2 model for species recognition
-        model_path = os.path.join(os.path.dirname(__file__), 'models', 'fish_species_model.h5')
-        if os.path.exists(model_path):
-            species_model = load_model(model_path)
-            logger.info("✅ Species recognition model (CNN + MobileNetV2) loaded successfully")
-        else:
-            logger.warning("⚠️ Species model not found, using fallback")
-            species_model = None
+        # Try to load best model first, fallback to default
+        species_model_path = os.path.join(os.path.dirname(__file__), 'models/best_fish_species_model.h5')
+        if not os.path.exists(species_model_path):
+            species_model_path = os.path.join(os.path.dirname(__file__), 'models/fish_species_model.h5')
         
-        # Load YOLOv8 model for fish detection
-        yolo_path = os.path.join(os.path.dirname(__file__), 'models', 'yolov8_fish.pt')
-        if os.path.exists(yolo_path):
-            yolo_model = YOLO(yolo_path)
-            logger.info("✅ YOLOv8 fish detection model loaded successfully")
-        else:
-            logger.warning("⚠️ YOLOv8 model not found, using fallback")
-            yolo_model = None
-            
+        species_model = load_model(species_model_path, compile=False)
+        species_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        logger.info(f"Species recognition model loaded from {species_model_path}")
     except Exception as e:
-        logger.error(f"❌ Error loading models: {str(e)}")
+        logger.error(f"Error loading species recognition model: {e}")
         species_model = None
+    
+    try:
+        # Load YOLO model with fallback to default
+        yolo_model_path = os.path.join(os.path.dirname(__file__), 'models/yolov8_fish.pt')
+        if os.path.exists(yolo_model_path):
+            yolo_model = YOLO(yolo_model_path)
+            logger.info(f"YOLO model loaded from {yolo_model_path}")
+        else:
+            yolo_model = YOLO('yolov8n.pt')
+            logger.info("Using default YOLOv8n model")
+    except Exception as e:
+        logger.error(f"Error loading YOLO model: {e}")
         yolo_model = None
 
 def calculate_weight_from_length(species, length_cm):
@@ -158,34 +327,58 @@ def detect_fish_yolo(image):
 def recognize_species(image):
     """Recognize fish species using CNN + MobileNetV2"""
     if species_model is None:
+        logger.error("Species recognition model not loaded")
         return "Unknown", 0.0, "Unknown"
     
     try:
-        # Preprocess image for MobileNetV2
-        img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        img_resized = cv2.resize(img_rgb, (224, 224))
-        img_array = img_to_array(img_resized)
-        img_preprocessed = preprocess_input(img_array)
-        img_batch = np.expand_dims(img_preprocessed, axis=0)
-        
-        # Predict species
-        predictions = species_model.predict(img_batch, verbose=0)
-        confidence = float(np.max(predictions))
-        predicted_idx = np.argmax(predictions)
-        
-        # Map to species names
-        species_list = list(FISH_SPECIES.keys())
-        if predicted_idx < len(species_list):
-            species = species_list[predicted_idx]
-            scientific_name = FISH_SPECIES[species]["scientific_name"]
+        # Convert image to RGB if it's in BGR format (OpenCV)
+        if len(image.shape) == 3 and image.shape[2] == 3:  # BGR image
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(image_rgb)
+        elif isinstance(image, np.ndarray):
+            img = Image.fromarray(image)
         else:
-            species = "Unknown"
-            scientific_name = "Unknown"
+            img = image
+            
+        # Preprocess image
+        img = img.resize((224, 224))
+        img_array = img_to_array(img)
+        img_array = np.expand_dims(img_array, axis=0)
+        img_array = preprocess_input(img_array)
         
-        return species, confidence, scientific_name
+        # Make prediction
+        predictions = species_model.predict(img_array, verbose=0)
+        predicted_class_idx = np.argmax(predictions[0])
+        confidence = float(predictions[0][predicted_class_idx])
+        
+        # Initialize default values
+        species_name = "Unknown"
+        scientific_name = "Unknown"
+        
+        # Get class name from mapping or fallback to index
+        if class_mapping and str(predicted_class_idx) in class_mapping:
+            species_name = class_mapping[str(predicted_class_idx)]
+            
+            # Verify species exists in FISH_SPECIES, otherwise find closest match
+            if species_name not in FISH_SPECIES:
+                for name in FISH_SPECIES.keys():
+                    if name.lower() in species_name.lower() or species_name.lower() in name.lower():
+                        species_name = name
+                        break
+        else:
+            # Fallback to index-based lookup if no mapping
+            species_list = list(FISH_SPECIES.keys())
+            if predicted_class_idx < len(species_list):
+                species_name = species_list[predicted_class_idx]
+        
+        # Get scientific name if available
+        if species_name in FISH_SPECIES:
+            scientific_name = FISH_SPECIES[species_name].get("scientific_name", "Unknown")
+            
+        return species_name, confidence, scientific_name
         
     except Exception as e:
-        logger.error(f"Error in species recognition: {str(e)}")
+        logger.error(f"Error in species recognition: {e}")
         return "Unknown", 0.0, "Unknown"
 
 def estimate_size_opencv(image, bbox):

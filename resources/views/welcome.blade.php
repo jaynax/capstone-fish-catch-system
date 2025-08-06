@@ -277,7 +277,7 @@
                 <div class="container">
                     <a class="navbar-brand" href="#">
                         <i class="fas fa-fish me-2"></i>
-                        BFAR Fish Monitoring
+                        Fish Catch Monitoring System
                     </a>
                     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -327,16 +327,7 @@
                         <h1 class="hero-title">
                             Bureau of Fisheries and<br>
                             <span style="color: var(--coral-orange);">Aquatic Resources</span>
-                        </h1>
-                        
-                        <p class="hero-subtitle">
-                            Fish Monitoring & Management System
-                        </p>
-                        
-                        <p class="hero-description">
-                            Comprehensive digital platform for monitoring fish catches, managing fisheries data, 
-                            and ensuring sustainable aquatic resource management across the Philippines.
-                        </p>
+                        </h1> 
                         
                         <div class="cta-buttons">
                             @auth
