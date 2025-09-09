@@ -321,23 +321,40 @@
                 <th>Weight (g):</th>
                 <td>{{ $catch->weight_g ? number_format($catch->weight_g, 1) : 'N/A' }}</td>
             </tr>
-            <tr>
-                <th>Species Recognition Confidence:</th>
-                <td>{{ $catch->confidence_score ?: 'N/A' }}</td>
-                <th>Fish Detection Confidence:</th>
-                <td>{{ $catch->detection_confidence ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Bounding Box Width (px):</th>
-                <td>{{ $catch->bbox_width ?: 'N/A' }}</td>
-                <th>Bounding Box Height (px):</th>
-                <td>{{ $catch->bbox_height ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Pixels per cm:</th>
-                <td colspan="3">{{ $catch->pixels_per_cm ? number_format($catch->pixels_per_cm, 4) : 'N/A' }}</td>
-            </tr>
         </table>
+        <br>
+        <!-- Report Metadata -->
+        <div class="metadata" style="margin-top: 20px;">
+            <table class="data-table">
+                <tr>
+                    <td width="25%"><strong>Report ID:</strong></td>
+                    <td width="25%">#{{ $catch->id }}</td>
+                    <td width="25%"><strong>Submitted by:</strong></td>
+                    <td width="25%">{{ $catch->user->name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Submitted on:</strong></td>
+                    <td>{{ $catch->created_at->format('F d, Y \a\t g:i A') }}</td>
+                    <td><strong>Last updated:</strong></td>
+                    <td>{{ $catch->updated_at->format('F d, Y \a\t g:i A') }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Processing mode:</strong></td>
+                    <td colspan="3">
+                        @if($catch->image_path)
+                            AI Processing (with photo)
+                        @else
+                            Manual Entry
+                        @endif
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="footer" style="text-align: center; margin-top: 30px; font-size: 11px; color: #666; border-top: 1px solid #eee; padding-top: 10px;">
+            <p>This is an official BFAR Fish Catch Monitoring Report generated on {{ now()->format('F d, Y \a\t g:i A') }}</p>
+            <p>Bureau of Fisheries and Aquatic Resources - National Stock Assessment Program</p>
+        </div>
     </div>
 
     <!-- Fish Photo -->
@@ -351,37 +368,6 @@
     </div>
     @endif
 
-    <!-- Report Metadata -->
-    <div class="metadata">
-        <table>
-            <tr>
-                <td><strong>Report ID:</strong></td>
-                <td>#{{ $catch->id }}</td>
-                <td><strong>Submitted by:</strong></td>
-                <td>{{ $catch->user->name }}</td>
-            </tr>
-            <tr>
-                <td><strong>Submitted on:</strong></td>
-                <td>{{ $catch->created_at->format('F d, Y \a\t g:i A') }}</td>
-                <td><strong>Last updated:</strong></td>
-                <td>{{ $catch->updated_at->format('F d, Y \a\t g:i A') }}</td>
-            </tr>
-            <tr>
-                <td><strong>Processing mode:</strong></td>
-                <td colspan="3">
-                    @if($catch->image_path)
-                        AI Processing (with photo)
-                    @else
-                        Manual Entry
-                    @endif
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <div class="footer">
-        <p>This is an official BFAR Fish Catch Monitoring Report generated on {{ now()->format('F d, Y \a\t g:i A') }}</p>
-        <p>Bureau of Fisheries and Aquatic Resources - National Stock Assessment Program</p>
-    </div>
 </body>
 </html> 

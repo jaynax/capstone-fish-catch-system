@@ -72,21 +72,44 @@
                             </div>
                         </div>
 
-                        <!-- ✨ GENERAL INFORMATION -->
+                        <!-- General Information -->
                         <div class="card mb-4 border-primary">
-                            <div class="card-header bg-primary text-white">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="bx bx-info-circle me-2"></i>✨ GENERAL INFORMATION</h5>
+                                <button type="button" class="btn btn-sm btn-light" id="addGeneralInfo">
+                                    <i class="bx bx-plus"></i> Add Location
+                                </button>
                             </div>
+                            
+                            <!-- Fisherman Information -->
                             <div class="card-body">
+                                <h6 class="mb-3"><i class="bx bx-id-card me-2"></i>Fisherman Information</h6>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="landing_center" class="form-label">Landing Center: <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="landing_center" name="landing_center" required>
+                                        <label for="fisherman_registration_id" class="form-label">Fisherman Registration ID: <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="fisherman_registration_id" name="fisherman_registration_id" required>
+                                        <div class="form-text">Enter the fisherman registration ID</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="date_sampling" class="form-label">Date of Sampling: <span class="text-danger">*</span></label>
-                                        <input type="date" class="form-control" id="date_sampling" name="date_sampling" required>
+                                        <label for="fisherman_name" class="form-label">Fisherman's Full Name: <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="fisherman_name" name="fisherman_name" required>
                                     </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Location Information -->
+                            <div class="card-body border-top">
+                                <h6 class="mb-3"><i class="bx bx-map me-2"></i>Location Information</h6>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Landing Center: <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="general[0][landing_center]" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Date of Sampling: <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" name="general[0][date_sampling]" required>
+                                            </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="time_landing" class="form-label">Time of Landing: <span class="text-danger">*</span></label>
                                         <input type="time" class="form-control" id="time_landing" name="time_landing" required>
@@ -117,9 +140,70 @@
 
                         <!-- 🚢 BOAT INFORMATION -->
                         <div class="card mb-4 border-info">
-                            <div class="card-header bg-info text-white">
+                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="bx bx-ship me-2"></i>🚢 BOAT INFORMATION</h5>
+                                <button type="button" class="btn btn-sm btn-light" id="addBoatInfo">
+                                    <i class="bx bx-plus"></i> Add Boat
+                                </button>
                             </div>
+                            <div class="card-body" id="boatInfoContainer">
+                                <!-- Boat Info Entry Template (Hidden) -->
+                                <div class="boat-entry card mb-3 border-secondary" style="display: none;">
+                                    <div class="card-header py-1 bg-light d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Boat #<span class="entry-number">1</span></span>
+                                        <button type="button" class="btn btn-sm btn-danger remove-boat" title="Remove this boat">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Boat Name (F/B): <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="boats[0][boat_name]" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Boat Type: <span class="text-danger">*</span></label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="boats[0][boat_type]" value="Motorized" required>
+                                                    <label class="form-check-label">☑ Motorized</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="boats[0][boat_type]" value="Non-motorized" required>
+                                                    <label class="form-check-label">☑ Non-motorized</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Length (m): <span class="text-danger">*</span></label>
+                                                <input type="number" step="0.1" class="form-control" name="boats[0][boat_length]" oninput="calculateGrossTonnage(this)" required>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Width (m): <span class="text-danger">*</span></label>
+                                                <input type="number" step="0.1" class="form-control" name="boats[0][boat_width]" oninput="calculateGrossTonnage(this)" required>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Depth (m): <span class="text-danger">*</span></label>
+                                                <input type="number" step="0.1" class="form-control" name="boats[0][boat_depth]" oninput="calculateGrossTonnage(this)" required>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Gross Tonnage (GT):</label>
+                                                <input type="number" step="0.1" class="form-control" name="boats[0][gross_tonnage]" readonly>
+                                                <div class="form-text">Auto-calculated</div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Horsepower (HP):</label>
+                                                <input type="number" class="form-control" name="boats[0][horsepower]">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Engine Type:</label>
+                                                <input type="text" class="form-control" name="boats[0][engine_type]">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Number of Fishermen on Board: <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" name="boats[0][fishermen_count]" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -139,19 +223,20 @@
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="boat_length" class="form-label">Length (m): <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.1" class="form-control" id="boat_length" name="boat_length" required>
+                                        <input type="number" step="0.1" class="form-control" id="boat_length" name="boat_length" oninput="calculateGrossTonnage()" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="boat_width" class="form-label">Width (m): <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.1" class="form-control" id="boat_width" name="boat_width" required>
+                                        <input type="number" step="0.1" class="form-control" id="boat_width" name="boat_width" oninput="calculateGrossTonnage()" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="boat_depth" class="form-label">Depth (m): <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.1" class="form-control" id="boat_depth" name="boat_depth" required>
+                                        <input type="number" step="0.1" class="form-control" id="boat_depth" name="boat_depth" oninput="calculateGrossTonnage()" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="gross_tonnage" class="form-label">Gross Tonnage (GT):</label>
-                                        <input type="number" step="0.1" class="form-control" id="gross_tonnage" name="gross_tonnage">
+                                        <input type="number" step="0.1" class="form-control" id="gross_tonnage" name="gross_tonnage" readonly>
+                                        <div class="form-text">Auto-calculated</div>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="horsepower" class="form-label">Horsepower (HP):</label>
@@ -171,25 +256,188 @@
 
                         <!-- 🎯 FISHING OPERATION DETAILS -->
                         <div class="card mb-4 border-success">
-                            <div class="card-header bg-success text-white">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="bx bx-anchor me-2"></i>🎯 FISHING OPERATION DETAILS</h5>
+                                <button type="button" class="btn btn-sm btn-light" id="addFishingOp">
+                                    <i class="bx bx-plus"></i> Add Operation
+                                </button>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" id="fishingOpContainer">
+                                <!-- Fishing Operation Entry Template (Hidden) -->
+                                <div class="fishing-op-entry card mb-3 border-secondary" style="display: none;">
+                                    <div class="card-header py-1 bg-light d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Operation #<span class="entry-number">1</span></span>
+                                        <button type="button" class="btn btn-sm btn-danger remove-fishing-op" title="Remove this operation">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Fishing Gear Type: <span class="text-danger">*</span></label>
+                                                <select class="form-select" name="fishing_ops[0][fishing_gear_type]" required>
+                                                    <option value="">Select Gear Type</option>
+                                                    <optgroup label="Net Gears">
+                                                        <option value="Gill Net">Gill Net</option>
+                                                        <option value="Drift Gill Net">Drift Gill Net</option>
+                                                        <option value="Set Gill Net">Set Gill Net</option>
+                                                        <option value="Trammel Net">Trammel Net</option>
+                                                        <option value="Beach Seine">Beach Seine</option>
+                                                        <option value="Purse Seine">Purse Seine</option>
+                                                        <option value="Ring Net">Ring Net</option>
+                                                        <option value="Danish Seine">Danish Seine</option>
+                                                        <option value="Trawl">Trawl (Bottom Trawl)</option>
+                                                        <option value="Midwater Trawl">Midwater Trawl</option>
+                                                        <option value="Pair Trawl">Pair Trawl</option>
+                                                        <option value="Baby Trawl">Baby Trawl</option>
+                                                        <option value="Bagnet">Bagnet (Suro)</option>
+                                                    </optgroup>
+                                                    <optgroup label="Line Gears">
+                                                        <option value="Handline">Handline</option>
+                                                        <option value="Multiple Handline">Multiple Handline</option>
+                                                        <option value="Troll Line">Troll Line</option>
+                                                        <option value="Longline">Longline</option>
+                                                        <option value="Bottom Set Longline">Bottom Set Longline</option>
+                                                        <option value="Drift Longline">Drift Longline</option>
+                                                        <option value="Pole and Line">Pole and Line</option>
+                                                        <option value="Jigging">Jigging</option>
+                                                    </optgroup>
+                                                    <optgroup label="Trap Gears">
+                                                        <option value="Fish Pot">Fish Pot</option>
+                                                        <option value="Lobster Pot">Lobster Pot</option>
+                                                        <option value="Crab Pot">Crab Pot</option>
+                                                        <option value="Bamboo Trap">Bamboo Trap</option>
+                                                        <option value="Funnel Net">Funnel Net (Bintol)</option>
+                                                        <option value="Fyke Net">Fyke Net</option>
+                                                    </optgroup>
+                                                    <optgroup label="Other Gears">
+                                                        <option value="Spear">Spear (Pana)</option>
+                                                        <option value="Harpoon">Harpoon</option>
+                                                        <option value="Scoop Net">Scoop Net (Sipol/Salap)</option>
+                                                        <option value="Cast Net">Cast Net (Lambat)</option>
+                                                        <option value="Drive-in Net">Drive-in Net (Pukot Hataw)</option>
+                                                        <option value="Lift Net">Lift Net (Bintahan)</option>
+                                                        <option value="Push Net">Push Net (Suro)</option>
+                                                        <option value="Dive">Dive (Pangulong)</option>
+                                                        <option value="Gathering">Gathering (Pulot)</option>
+                                                        <option value="Other">Other (Please specify in notes)</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Specifications:</label>
+                                                <textarea class="form-control" name="fishing_ops[0][gear_specifications]" rows="2"></textarea>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Number of Hooks/Hauls:</label>
+                                                <input type="number" class="form-control" name="fishing_ops[0][hooks_hauls]">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Net/Line Length (m):</label>
+                                                <input type="number" step="0.1" class="form-control" name="fishing_ops[0][net_line_length]">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Soaking/Fishing Time (hrs):</label>
+                                                <input type="number" step="0.1" class="form-control" name="fishing_ops[0][soaking_time]">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Mesh Size (cm):</label>
+                                                <input type="number" step="0.1" class="form-control" name="fishing_ops[0][mesh_size]">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Number of Days Fished: <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" name="fishing_ops[0][days_fished]" required>
+                                            </div>
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Fishing Location (Click on the map or enter coordinates):</label>
+                                                <div class="map-container" style="height: 300px; margin-bottom: 15px; border-radius: 5px;"></div>
+                                                <div class="input-group mb-3">
+                                                    <span class="input-group-text">Latitude</span>
+                                                    <input type="number" step="0.000001" class="form-control" name="fishing_ops[0][latitude]" placeholder="e.g. 12.8797">
+                                                    <span class="input-group-text">Longitude</span>
+                                                    <input type="number" step="0.000001" class="form-control" name="fishing_ops[0][longitude]" placeholder="e.g. 121.7740">
+                                                </div>
+                                                <input type="hidden" name="fishing_ops[0][fishing_location]">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Payao Used?</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="fishing_ops[0][payao_used]" value="Yes">
+                                                    <label class="form-check-label">☑ Yes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="fishing_ops[0][payao_used]" value="No">
+                                                    <label class="form-check-label">☑ No</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Fishing Effort Notes:</label>
+                                                <textarea class="form-control" name="fishing_ops[0][fishing_effort_notes]" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of Template -->
+                                
+                                <!-- Initial Visible Entry -->
+                                <div class="fishing-op-entry card mb-3 border-secondary">
+                                    <div class="card-header py-1 bg-light d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Operation #<span class="entry-number">1</span></span>
+                                        <button type="button" class="btn btn-sm btn-danger remove-fishing-op d-none" title="Remove this operation">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="fishing_gear_type" class="form-label">Fishing Gear Type: <span class="text-danger">*</span></label>
                                         <select class="form-select" id="fishing_gear_type" name="fishing_gear_type" required>
                                             <option value="">Select Gear Type</option>
-                                            <option value="Gill Net">Gill Net</option>
-                                            <option value="Trawl">Trawl</option>
-                                            <option value="Hook and Line">Hook and Line</option>
-                                            <option value="Longline">Longline</option>
-                                            <option value="Purse Seine">Purse Seine</option>
-                                            <option value="Ring Net">Ring Net</option>
-                                            <option value="Cast Net">Cast Net</option>
-                                            <option value="Bamboo Trap">Bamboo Trap</option>
-                                            <option value="Fish Pot">Fish Pot</option>
-                                            <option value="Other">Other</option>
+                                            <optgroup label="Net Gears">
+                                                <option value="Gill Net">Gill Net</option>
+                                                <option value="Drift Gill Net">Drift Gill Net</option>
+                                                <option value="Set Gill Net">Set Gill Net</option>
+                                                <option value="Trammel Net">Trammel Net</option>
+                                                <option value="Beach Seine">Beach Seine</option>
+                                                <option value="Purse Seine">Purse Seine</option>
+                                                <option value="Ring Net">Ring Net</option>
+                                                <option value="Danish Seine">Danish Seine</option>
+                                                <option value="Trawl">Trawl (Bottom Trawl)</option>
+                                                <option value="Midwater Trawl">Midwater Trawl</option>
+                                                <option value="Pair Trawl">Pair Trawl</option>
+                                                <option value="Baby Trawl">Baby Trawl</option>
+                                                <option value="Bagnet">Bagnet (Suro)</option>
+                                            </optgroup>
+                                            <optgroup label="Line Gears">
+                                                <option value="Handline">Handline</option>
+                                                <option value="Multiple Handline">Multiple Handline</option>
+                                                <option value="Troll Line">Troll Line</option>
+                                                <option value="Longline">Longline</option>
+                                                <option value="Bottom Set Longline">Bottom Set Longline</option>
+                                                <option value="Drift Longline">Drift Longline</option>
+                                                <option value="Pole and Line">Pole and Line</option>
+                                                <option value="Jigging">Jigging</option>
+                                            </optgroup>
+                                            <optgroup label="Trap Gears">
+                                                <option value="Fish Pot">Fish Pot</option>
+                                                <option value="Lobster Pot">Lobster Pot</option>
+                                                <option value="Crab Pot">Crab Pot</option>
+                                                <option value="Bamboo Trap">Bamboo Trap</option>
+                                                <option value="Funnel Net">Funnel Net (Bintol)</option>
+                                                <option value="Fyke Net">Fyke Net</option>
+                                            </optgroup>
+                                            <optgroup label="Other Gears">
+                                                <option value="Spear">Spear (Pana)</option>
+                                                <option value="Harpoon">Harpoon</option>
+                                                <option value="Scoop Net">Scoop Net (Sipol/Salap)</option>
+                                                <option value="Cast Net">Cast Net (Lambat)</option>
+                                                <option value="Drive-in Net">Drive-in Net (Pukot Hataw)</option>
+                                                <option value="Lift Net">Lift Net (Bintahan)</option>
+                                                <option value="Push Net">Push Net (Suro)</option>
+                                                <option value="Dive">Dive (Pangulong)</option>
+                                                <option value="Gathering">Gathering (Pulot)</option>
+                                                <option value="Other">Other (Please specify in notes)</option>
+                                            </optgroup>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -248,59 +496,73 @@
 
                         <!-- ⚖️ CATCH INFORMATION -->
                         <div class="card mb-4 border-warning">
-                            <div class="card-header bg-warning text-white">
+                            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><i class="bx bx-weight me-2"></i>⚖️ CATCH INFORMATION</h5>
+                                <button type="button" class="btn btn-sm btn-light" id="addCatchInfo">
+                                    <i class="bx bx-plus"></i> Add Catch
+                                </button>
                             </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Catch Type: <span class="text-danger">*</span></label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="catch_type" id="complete" value="Complete" required>
-                                            <label class="form-check-label" for="complete">☑ Complete</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="catch_type" id="incomplete" value="Incomplete" required>
-                                            <label class="form-check-label" for="incomplete">☑ Incomplete</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="catch_type" id="partly_sold" value="Partly Sold" required>
-                                            <label class="form-check-label" for="partly_sold">☑ Partly Sold</label>
-                                        </div>
+                            <div class="card-body" id="catchInfoContainer">
+                                <!-- Catch Information Entry Template (Hidden) -->
+                                <div class="catch-entry card mb-3 border-secondary" style="display: none;">
+                                    <div class="card-header py-1 bg-light d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Catch #<span class="catch-number">1</span></span>
+                                        <button type="button" class="btn btn-sm btn-danger remove-catch" title="Remove this catch">
+                                            <i class="bx bx-trash"></i>
+                                        </button>
                                     </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="total_catch_kg" class="form-label">Total Catch (kg): <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.1" class="form-control" id="total_catch_kg" name="total_catch_kg" required>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label class="form-label">Sub-sample Taken?</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="subsample_taken" id="subsample_yes" value="Yes">
-                                            <label class="form-check-label" for="subsample_yes">☑ Yes</label>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Catch Type: <span class="text-danger">*</span></label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][catch_type]" value="Complete" required>
+                                                    <label class="form-check-label">☑ Complete</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][catch_type]" value="Incomplete" required>
+                                                    <label class="form-check-label">☑ Incomplete</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][catch_type]" value="Partly Sold" required>
+                                                    <label class="form-check-label">☑ Partly Sold</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Total Catch (kg): <span class="text-danger">*</span></label>
+                                                <input type="number" step="0.1" class="form-control" name="catches[0][total_catch_kg]" required>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label">Sub-sample Taken?</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][subsample_taken]" value="Yes">
+                                                    <label class="form-check-label">☑ Yes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][subsample_taken]" value="No">
+                                                    <label class="form-check-label">☑ No</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sub-sample Weight (kg):</label>
+                                                <input type="number" step="0.1" class="form-control" name="catches[0][subsample_weight]">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Were any fish below legal size?</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][below_legal_size]" value="Yes">
+                                                    <label class="form-check-label">☑ Yes</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="catches[0][below_legal_size]" value="No">
+                                                    <label class="form-check-label">☑ No</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label">If Yes, which species:</label>
+                                                <input type="text" class="form-control" name="catches[0][below_legal_species]">
+                                            </div>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="subsample_taken" id="subsample_no" value="No">
-                                            <label class="form-check-label" for="subsample_no">☑ No</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="subsample_weight" class="form-label">Sub-sample Weight (kg):</label>
-                                        <input type="number" step="0.1" class="form-control" id="subsample_weight" name="subsample_weight">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Were any fish below legal size?</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="below_legal_size" id="below_yes" value="Yes">
-                                            <label class="form-check-label" for="below_yes">☑ Yes</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="below_legal_size" id="below_no" value="No">
-                                            <label class="form-check-label" for="below_no">☑ No</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 mb-3">
-                                        <label for="below_legal_species" class="form-label">If Yes, which species:</label>
-                                        <input type="text" class="form-control" id="below_legal_species" name="below_legal_species">
                                     </div>
                                 </div>
                             </div>
@@ -595,6 +857,20 @@ document.getElementById('autoModeToggle').addEventListener('change', function() 
 });
 
 // Update UI based on mode
+// Calculate Gross Tonnage based on boat dimensions (L x W x D x 0.45)
+function calculateGrossTonnage() {
+    const length = parseFloat(document.getElementById('boat_length').value) || 0;
+    const width = parseFloat(document.getElementById('boat_width').value) || 0;
+    const depth = parseFloat(document.getElementById('boat_depth').value) || 0;
+    
+    if (length > 0 && width > 0 && depth > 0) {
+        const grossTonnage = (length * width * depth) * 0.45;
+        document.getElementById('gross_tonnage').value = grossTonnage.toFixed(2);
+    } else {
+        document.getElementById('gross_tonnage').value = '';
+    }
+}
+
 function updateModeUI() {
     const speciesField = document.getElementById('species');
     const scientificNameField = document.getElementById('scientific_name');
@@ -936,6 +1212,112 @@ function hideProcessingStatus() {
 }
 
 // Show processing complete
+// Function to clone and update form fields with new indices
+function cloneAndUpdateFields(container, entryClass, namePrefix, entryIndex) {
+    const entries = container.querySelectorAll(`.${entryClass}:not([style*="display: none"])`);
+    const template = container.querySelector(`.${entryClass}`);
+    const newEntry = template.cloneNode(true);
+    
+    // Update the entry number display if exists
+    const numberDisplay = newEntry.querySelector('.entry-number');
+    if (numberDisplay) {
+        numberDisplay.textContent = entries.length + 1;
+    }
+    
+    // Update all input names with the new index
+    const inputs = newEntry.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.name) {
+            input.name = input.name.replace(new RegExp(`${namePrefix}\\[\\d+\\]`, 'g'), `${namePrefix}[${entryIndex}]`);
+            // Reset radio/checkbox states for the new entry
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                input.checked = false;
+            } else if (input.type !== 'button' && input.type !== 'submit') {
+                input.value = '';
+            }
+        }
+    });
+    
+    // Make the new entry visible
+    newEntry.style.display = 'block';
+    
+    // Add the new entry before the template
+    container.insertBefore(newEntry, template);
+    
+    return newEntry;
+}
+
+// Function to add new catch information fields
+function addCatchInfo() {
+    const container = document.getElementById('catchInfoContainer');
+    const entries = container.querySelectorAll('.catch-entry:not([style*="display: none"])');
+    const newEntry = cloneAndUpdateFields(container, 'catch-entry', 'catches', entries.length);
+    
+    // Update the catch number display
+    newEntry.querySelector('.catch-number').textContent = entries.length + 1;
+    
+    // Enable remove button if there's more than one entry
+    updateRemoveButtons();
+}
+
+// Function to remove a catch entry
+function removeCatchEntry(button) {
+    const entry = button.closest('.catch-entry');
+    if (document.querySelectorAll('.catch-entry:not([style*="display: none"])').length <= 1) {
+        // Don't remove the last entry
+        return;
+    }
+    entry.remove();
+    
+    // Update catch numbers and input names
+    updateCatchNumbers();
+    updateRemoveButtons();
+}
+
+// Update catch numbers and input names after removal
+function updateCatchNumbers() {
+    const entries = document.querySelectorAll('.catch-entry:not([style*="display: none"])');
+    entries.forEach((entry, index) => {
+        // Update the catch number display
+        entry.querySelector('.catch-number').textContent = index + 1;
+        
+        // Update all input names with the new index
+        const inputs = entry.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (input.name) {
+                input.name = input.name.replace(/catches\[\d+\]/g, `catches[${index}]`);
+            }
+        });
+    });
+}
+
+// Show/hide remove buttons based on number of entries
+function updateRemoveButtons() {
+    const entries = document.querySelectorAll('.catch-entry:not([style*="display: none"])');
+    const removeButtons = document.querySelectorAll('.remove-catch');
+    
+    // Show remove buttons only if there's more than one entry
+    removeButtons.forEach(button => {
+        button.style.visibility = entries.length > 1 ? 'visible' : 'hidden';
+    });
+}
+
+// Initialize the first catch entry
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click event for adding new catch info
+    document.getElementById('addCatchInfo').addEventListener('click', addCatchInfo);
+    
+    // Add click event for removing catch info (using event delegation)
+    document.getElementById('catchInfoContainer').addEventListener('click', function(e) {
+        if (e.target.closest('.remove-catch')) {
+            removeCatchEntry(e.target.closest('.remove-catch'));
+        }
+    });
+    
+    // Add the first catch entry
+    addCatchInfo();
+});
+
 function showProcessingComplete() {
     document.getElementById('processingComplete').style.display = 'block';
     setTimeout(() => {
@@ -970,9 +1352,350 @@ function removeLengthRow(button) {
 }
 
 // Auto-fill current date and initialize mode
+// Initialize plus button event listeners
+function initPlusButtons() {
+    // Add catch info
+    document.getElementById('addCatchInfo')?.addEventListener('click', addCatchInfo);
+    
+    // Add general info
+    document.getElementById('addGeneralInfo')?.addEventListener('click', addGeneralInfo);
+    
+    // Add boat info
+    document.getElementById('addBoatInfo')?.addEventListener('click', addBoatInfo);
+    
+    // Add fishing operation
+    document.getElementById('addFishingOp')?.addEventListener('click', addFishingOp);
+    const container = document.getElementById('fishingOpContainer');
+    const entries = container.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
+    const newEntry = cloneAndUpdateFields(container, 'fishing-op-entry', 'fishing_ops', entries.length);
+    
+    // Update the entry number display
+    newEntry.querySelector('.entry-number').textContent = entries.length + 1;
+}
+
+// Function to add new fishing operation entry
+function addFishingOp() {
+    const container = document.getElementById('fishingOpContainer');
+    const entries = container.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
+    const newEntry = cloneAndUpdateFields(container, 'fishing-op-entry', 'fishing_ops', entries.length);
+    
+    // Update the entry number display
+    newEntry.querySelector('.entry-number').textContent = entries.length + 1;
+    
+    // Initialize map for this entry
+    const mapContainer = newEntry.querySelector('.map-container');
+    if (mapContainer) {
+        // Create a new map instance for this entry
+        const latitudeInput = newEntry.querySelector('input[name$="[latitude]"]');
+        const longitudeInput = newEntry.querySelector('input[name$="[longitude]"]');
+        const locationInput = newEntry.querySelector('input[name$="[fishing_location]"]');
+        
+        // Add a unique ID to the map container
+        const mapId = 'map-' + Date.now();
+        mapContainer.id = mapId;
+        
+        // Initialize map after a small delay to ensure DOM is ready
+        setTimeout(() => {
+            const map = L.map(mapId).setView([12.8797, 121.7740], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            let marker = null;
+            
+            // Add click event to set location
+            map.on('click', function(e) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                
+                marker = L.marker(e.latlng).addTo(map);
+                if (latitudeInput) latitudeInput.value = e.latlng.lat.toFixed(6);
+                if (longitudeInput) longitudeInput.value = e.latlng.lng.toFixed(6);
+                if (locationInput) locationInput.value = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+            });
+            
+            // Update location when coordinates are manually entered
+            const updateMarker = () => {
+                const lat = parseFloat(latitudeInput?.value);
+                const lng = parseFloat(longitudeInput?.value);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    if (marker) {
+                        map.removeLayer(marker);
+                    }
+                    const latLng = L.latLng(lat, lng);
+                    marker = L.marker(latLng).addTo(map);
+                    map.setView(latLng, Math.max(map.getZoom(), 10));
+                    if (locationInput) locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                }
+            };
+            
+            if (latitudeInput && longitudeInput) {
+                latitudeInput.addEventListener('change', updateMarker);
+                longitudeInput.addEventListener('change', updateMarker);
+            }
+        }, 100);
+    }
+    
+    // Enable remove button if there's more than one entry
+    updateRemoveButtons('.fishing-op-entry', '.remove-fishing-op');
+}
+
+// Function to add new fishing operation entry
+function addFishingOp() {
+    const container = document.getElementById('fishingOpContainer');
+    const entries = container.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
+    const template = container.querySelector('.fishing-op-entry[style*="display: none"]');
+    
+    if (!template) return;
+    
+    const newEntry = template.cloneNode(true);
+    const entryIndex = entries.length;
+    
+    // Update the entry number
+    newEntry.querySelector('.entry-number').textContent = entryIndex + 1;
+    
+    // Update all input names with the new index
+    const inputs = newEntry.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.name) {
+            input.name = input.name.replace(/fishing_ops\[\d+\]/g, `fishing_ops[${entryIndex}]`);
+            // Reset values for the new entry
+            if (input.type === 'radio' || input.type === 'checkbox') {
+                input.checked = false;
+            } else if (input.type !== 'button' && input.type !== 'submit') {
+                input.value = '';
+            }
+        }
+    });
+    
+    // Show the remove button (but keep it hidden for the first entry)
+    if (entryIndex > 0) {
+        newEntry.querySelector('.remove-fishing-op').classList.remove('d-none');
+    }
+    
+    // Make the new entry visible and insert it before the template
+    newEntry.style.display = 'block';
+    container.insertBefore(newEntry, template);
+    
+    // Initialize map for the new entry
+    initMapForEntry(newEntry);
+}
+
+// Function to initialize map for a fishing operation entry
+function initMapForEntry(entry) {
+    const mapContainer = entry.querySelector('.map-container');
+    if (!mapContainer) return;
+    
+    const mapId = 'map-' + Date.now();
+    mapContainer.id = mapId;
+    
+    // Initialize map after a small delay to ensure DOM is ready
+    setTimeout(() => {
+        const map = L.map(mapId).setView([12.8797, 121.7740], 5);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+        
+        const latitudeInput = entry.querySelector('input[name$="[latitude]"]');
+        const longitudeInput = entry.querySelector('input[name$="[longitude]"]');
+        const locationInput = entry.querySelector('input[name$="[fishing_location]"]');
+        
+        let marker = null;
+        
+        // Add click event to set location
+        map.on('click', function(e) {
+            if (marker) {
+                map.removeLayer(marker);
+            }
+            
+            marker = L.marker(e.latlng).addTo(map);
+            if (latitudeInput) latitudeInput.value = e.latlng.lat.toFixed(6);
+            if (longitudeInput) longitudeInput.value = e.latlng.lng.toFixed(6);
+            if (locationInput) locationInput.value = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+        });
+        
+        // Update location when coordinates are manually entered
+        const updateMarker = () => {
+            const lat = parseFloat(latitudeInput?.value);
+            const lng = parseFloat(longitudeInput?.value);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+                const latLng = L.latLng(lat, lng);
+                marker = L.marker(latLng).addTo(map);
+                map.setView(latLng, Math.max(map.getZoom(), 10));
+                if (locationInput) locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+        };
+        
+        if (latitudeInput && longitudeInput) {
+            latitudeInput.addEventListener('change', updateMarker);
+            longitudeInput.addEventListener('change', updateMarker);
+        }
+    }, 100);
+}
+
+// Function to add new boat information entry
+function addBoatInfo() {
+    const container = document.getElementById('boatInfoContainer');
+    const entries = container.querySelectorAll('.boat-entry:not([style*="display: none"])');
+    const newEntry = cloneAndUpdateFields(container, 'boat-entry', 'boats', entries.length);
+    
+    // Update the entry number display
+    newEntry.querySelector('.entry-number').textContent = entries.length + 1;
+    
+    // Add event listeners for gross tonnage calculation
+    const lengthInput = newEntry.querySelector('input[name$="[boat_length]"]');
+    const widthInput = newEntry.querySelector('input[name$="[boat_width]"]');
+    const depthInput = newEntry.querySelector('input[name$="[boat_depth]"]');
+    const gtInput = newEntry.querySelector('input[name$="[gross_tonnage]"]');
+    
+    if (lengthInput && widthInput && depthInput && gtInput) {
+        const calculate = () => {
+            const length = parseFloat(lengthInput.value) || 0;
+            const width = parseFloat(widthInput.value) || 0;
+            const depth = parseFloat(depthInput.value) || 0;
+            const gt = (length * width * depth * 0.2).toFixed(1); // Simple GT calculation
+            gtInput.value = gt;
+        };
+        
+        lengthInput.addEventListener('input', calculate);
+        widthInput.addEventListener('input', calculate);
+        depthInput.addEventListener('input', calculate);
+    }
+    
+    // Enable remove button if there's more than one entry
+    updateRemoveButtons('.boat-entry', '.remove-boat');
+}
+
+// Function to add new general information entry
+function addGeneralInfo() {
+    const container = document.getElementById('generalInfoContainer');
+    const entries = container.querySelectorAll('.general-entry:not([style*="display: none"])');
+    const newEntry = cloneAndUpdateFields(container, 'general-entry', 'general', entries.length);
+    
+    // Update the entry number display
+    newEntry.querySelector('.entry-number').textContent = entries.length + 1;
+    
+    // Set today's date as default for new entries
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = newEntry.querySelector('input[type="date"]');
+    if (dateInput && !dateInput.value) {
+        dateInput.value = today;
+    }
+    
+    // Enable remove button if there's more than one entry
+    updateRemoveButtons('.general-entry', '.remove-entry');
+}
+
+// Update all remove buttons' visibility
+function updateRemoveButtons(entrySelector, removeButtonSelector) {
+    const entries = document.querySelectorAll(entrySelector);
+    const removeButtons = document.querySelectorAll(removeButtonSelector);
+    
+    if (entries.length <= 1) {
+        removeButtons.forEach(btn => {
+            btn.style.display = 'none';
+        });
+    } else {
+        removeButtons.forEach(btn => {
+            btn.style.display = 'inline-block';
+        });
+    }
+}
+
+// Handle remove entry buttons
+document.addEventListener('click', function(e) {
+    // Handle remove catch buttons
+    if (e.target.closest('.remove-catch')) {
+        const entry = e.target.closest('.catch-entry');
+        if (entry && document.querySelectorAll('.catch-entry:not([style*="display: none"])').length > 1) {
+            entry.remove();
+            updateRemoveButtons('.catch-entry', '.remove-catch');
+            // Renumber remaining entries
+            document.querySelectorAll('.catch-entry:not([style*="display: none"])').forEach((entry, index) => {
+                entry.querySelector('.catch-number').textContent = index + 1;
+            });
+        }
+    }
+    
+    // Handle remove general info buttons
+    if (e.target.closest('.remove-entry')) {
+        const entry = e.target.closest('.general-entry');
+        if (entry && document.querySelectorAll('.general-entry:not([style*="display: none"])').length > 1) {
+            entry.remove();
+            updateRemoveButtons('.general-entry', '.remove-entry');
+            // Renumber remaining entries
+            document.querySelectorAll('.general-entry:not([style*="display: none"])').forEach((entry, index) => {
+                entry.querySelector('.entry-number').textContent = index + 1;
+            });
+        }
+    }
+    
+    // Handle remove boat buttons
+    if (e.target.closest('.remove-boat')) {
+        const entry = e.target.closest('.boat-entry');
+        if (entry && document.querySelectorAll('.boat-entry:not([style*="display: none"])').length > 1) {
+            entry.remove();
+            updateRemoveButtons('.boat-entry', '.remove-boat');
+            // Renumber remaining entries
+            document.querySelectorAll('.boat-entry:not([style*="display: none"])').forEach((entry, index) => {
+                entry.querySelector('.entry-number').textContent = index + 1;
+            });
+        }
+    }
+    
+    // Handle remove fishing operation buttons
+    if (e.target.closest('.remove-fishing-op')) {
+        const entry = e.target.closest('.fishing-op-entry');
+        if (entry && document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').length > 1) {
+            entry.remove();
+            // Renumber remaining entries
+            document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').forEach((entry, index) => {
+                entry.querySelector('.entry-number').textContent = index + 1;
+                // Hide remove button for the first entry
+                const removeBtn = entry.querySelector('.remove-fishing-op');
+                if (removeBtn) {
+                    removeBtn.classList.toggle('d-none', index === 0);
+                }
+            });
+        }
+    }
+    
+    // Handle remove fishing operation buttons
+    if (e.target.closest('.remove-fishing-op')) {
+        const entry = e.target.closest('.fishing-op-entry');
+        if (entry && document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').length > 1) {
+            entry.remove();
+            updateRemoveButtons('.fishing-op-entry', '.remove-fishing-op');
+            // Renumber remaining entries
+            document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').forEach((entry, index) => {
+                entry.querySelector('.entry-number').textContent = index + 1;
+            });
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date_sampling').value = today;
+    
+    // Initialize plus buttons
+    initPlusButtons();
+    
+    // Add first entries by default
+    addGeneralInfo();
+    addBoatInfo();
+    
+    // Initialize map for the first fishing operation entry
+    const firstFishingOp = document.querySelector('.fishing-op-entry:not([style*="display: none"])');
+    if (firstFishingOp) {
+        initMapForEntry(firstFishingOp);
+    }
+    addFishingOp();
     
     // Initialize mode UI
     updateModeUI();

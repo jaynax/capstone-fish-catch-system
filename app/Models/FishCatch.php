@@ -12,6 +12,10 @@ class FishCatch extends Model
     protected $table = 'catches';
 
     protected $fillable = [
+        // Fisherman Information
+        'fisherman_registration_id',
+        'fisherman_name',
+        
         // General Information
         'region',
         'landing_center',

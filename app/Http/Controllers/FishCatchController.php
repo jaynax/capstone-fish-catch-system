@@ -18,6 +18,10 @@ class FishCatchController extends Controller
         $isAutoMode = $request->hasFile('image') && $request->file('image')->isValid();
         
         $validationRules = [
+            // Fisherman Information
+            'fisherman_registration_id' => 'required|string|max:255',
+            'fisherman_name' => 'required|string|max:255',
+            
             // General Information
             'region' => 'required|string|max:255',
             'landing_center' => 'required|string|max:255',
