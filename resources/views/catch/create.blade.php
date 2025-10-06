@@ -693,37 +693,10 @@
                                 </div>
 
                                 <!-- AI Processing Details -->
-                                <div class="row mt-3">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="confidence_score" class="form-label">Species Recognition Confidence:</label>
-                                        <input type="text" class="form-control" id="confidence_score" name="confidence_score" readonly>
-                                        <div class="form-text">CNN + MobileNetV2 confidence percentage</div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="detection_confidence" class="form-label">Fish Detection Confidence:</label>
-                                        <input type="text" class="form-control" id="detection_confidence" name="detection_confidence" readonly>
-                                        <div class="form-text">YOLOv8 detection confidence percentage</div>
-                                    </div>
-                                </div>
+                                
 
                                 <!-- Size Estimation Details -->
-                                <div class="row mt-3">
-                                    <div class="col-md-4 mb-3">
-                                        <label for="bbox_width" class="form-label">Bounding Box Width (px):</label>
-                                        <input type="number" class="form-control" id="bbox_width" name="bbox_width" readonly>
-                                        <div class="form-text">YOLOv8 detected fish width in pixels</div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="bbox_height" class="form-label">Bounding Box Height (px):</label>
-                                        <input type="number" class="form-control" id="bbox_height" name="bbox_height" readonly>
-                                        <div class="form-text">YOLOv8 detected fish height in pixels</div>
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="pixels_per_cm" class="form-label">Pixels per cm (Reference):</label>
-                                        <input type="number" step="0.01" class="form-control" id="pixels_per_cm" name="pixels_per_cm" readonly>
-                                        <div class="form-text">Calibration ratio for size estimation</div>
-                                    </div>
-                                </div>
+                               
 
                                 <!-- AI Processing Status -->
                                 <div class="row mt-3">

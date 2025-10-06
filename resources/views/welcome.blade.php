@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>BFAR Fish Monitoring System</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="BFAR Fish Monitoring System - Comprehensive solution for monitoring and managing fisheries data">
+    <title>BFAR Fish Monitoring System</title>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,600,700&display=swap" rel="stylesheet" />
-        
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        <!-- Font Awesome -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ asset('assets/img/icons/brands/BFAR.png') }}">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
         <!-- Styles -->
         <style>
@@ -53,6 +60,7 @@
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
+                overflow: hidden;
             }
 
             .navbar {
@@ -83,29 +91,39 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 4rem 0;
+                padding: 6rem 0 4rem;
                 position: relative;
+                overflow: hidden;
             }
 
             .hero-content {
                 text-align: center;
                 color: white;
-                max-width: 800px;
+                max-width: 900px;
                 margin: 0 auto;
                 padding: 2rem;
+                position: relative;
+                z-index: 10;
             }
 
             .bfar-logo {
-                width: 120px;
-                height: 120px;
-                background: white;
+                width: 140px;
+                height: 140px;
+                background: rgba(255, 255, 255, 0.95);
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 2rem;
-                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-                animation: float 3s ease-in-out infinite;
+                margin: 0 auto 2.5rem;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+                animation: float 4s ease-in-out infinite;
+                border: 5px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.5s ease;
+            }
+            
+            .bfar-logo:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
             }
 
             .bfar-logo i {
@@ -120,40 +138,62 @@
 
             .hero-title {
                 font-size: 3.5rem;
-                font-weight: 700;
-                margin-bottom: 1rem;
+                font-weight: 800;
+                margin-bottom: 1.5rem;
                 text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+                line-height: 1.2;
+                letter-spacing: -0.5px;
             }
 
             .hero-subtitle {
-                font-size: 1.5rem;
+                font-size: 1.6rem;
                 margin-bottom: 2rem;
                 opacity: 0.9;
-                font-weight: 400;
+                font-weight: 500;
+                line-height: 1.4;
+                max-width: 700px;
+                margin-left: auto;
+                margin-right: auto;
             }
 
             .hero-description {
-                font-size: 1.1rem;
-                margin-bottom: 3rem;
-                opacity: 0.8;
-                line-height: 1.6;
+                font-size: 1.2rem;
+                margin: 0 auto 3rem;
+                opacity: 0.9;
+                line-height: 1.7;
+                max-width: 700px;
             }
 
             .cta-buttons {
                 display: flex;
-                gap: 1rem;
+                gap: 1.2rem;
                 justify-content: center;
                 flex-wrap: wrap;
+                margin-top: 2rem;
             }
 
-            .btn-primary {
-                background: var(--coral-orange);
-                border: none;
-                padding: 1rem 2rem;
+            .btn {
+                padding: 0.9rem 2.2rem;
                 font-weight: 600;
                 border-radius: 50px;
-                transition: all 0.3s ease;
-                box-shadow: 0 10px 30px rgba(249, 115, 22, 0.4);
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                font-size: 0.95rem;
+            }
+            
+            .btn i {
+                margin-right: 8px;
+                font-size: 1.1em;
+            }
+            
+            .btn-primary {
+                background: var(--coral-orange);
+                border: 2px solid var(--coral-orange);
+                box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
             }
 
             .btn-primary:hover {
@@ -165,11 +205,9 @@
             .btn-outline-light {
                 border: 2px solid white;
                 color: white;
-                padding: 1rem 2rem;
-                font-weight: 600;
-                border-radius: 50px;
-                transition: all 0.3s ease;
                 background: transparent;
+                backdrop-filter: blur(5px);
+                background-color: rgba(255, 255, 255, 0.1);
             }
 
             .btn-outline-light:hover {
@@ -179,21 +217,52 @@
             }
 
             .features-section {
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.98);
                 backdrop-filter: blur(10px);
-                padding: 4rem 0;
-                margin-top: 2rem;
+                padding: 6rem 0;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .features-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 10px;
+                background: linear-gradient(90deg, var(--bfar-blue), var(--ocean-blue), var(--coral-orange));
             }
 
             .feature-card {
                 background: white;
-                border-radius: 20px;
-                padding: 2rem;
+                border-radius: 15px;
+                padding: 2.5rem 2rem;
                 text-align: center;
-                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-                transition: all 0.3s ease;
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+                transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+                border: 1px solid rgba(0, 0, 0, 0.03);
                 height: 100%;
+                position: relative;
+                overflow: hidden;
+                background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            }
+            
+            .feature-card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 5px;
+                background: linear-gradient(90deg, var(--bfar-blue), var(--ocean-blue));
+                transition: all 0.3s ease;
+                transform: scaleX(0);
+                transform-origin: left;
+            }
+            
+            .feature-card:hover::after {
+                transform: scaleX(1);
             }
 
             .feature-card:hover {
@@ -202,36 +271,125 @@
             }
 
             .feature-icon {
-                width: 80px;
-                height: 80px;
+                width: 90px;
+                height: 90px;
                 background: linear-gradient(135deg, var(--bfar-blue), var(--ocean-blue));
                 border-radius: 50%;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin: 0 auto 1.5rem;
+                margin: 0 auto 1.8rem;
                 color: white;
-                font-size: 2rem;
+                font-size: 2.2rem;
+                box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+                transition: all 0.3s ease;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .feature-icon::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(
+                    to bottom right,
+                    rgba(255, 255, 255, 0.3),
+                    rgba(255, 255, 255, 0)
+                );
+                transform: rotate(30deg);
             }
 
             .feature-title {
                 color: var(--bfar-blue);
                 font-weight: 700;
-                margin-bottom: 1rem;
-                font-size: 1.3rem;
+                margin-bottom: 1.2rem;
+                font-size: 1.4rem;
+                position: relative;
+                display: inline-block;
+                padding-bottom: 0.5rem;
+            }
+            
+            .feature-title::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 3px;
+                background: var(--coral-orange);
+                transition: all 0.3s ease;
+            }
+            
+            .feature-card:hover .feature-title::after {
+                width: 80px;
             }
 
             .feature-description {
-                color: #64748b;
-                line-height: 1.6;
+                color: #4b5563;
+                line-height: 1.7;
+                font-size: 1.02rem;
+                margin-bottom: 0;
             }
 
             .footer {
                 background: var(--deep-sea);
-                color: white;
+                color: rgba(255, 255, 255, 0.8);
                 text-align: center;
-                padding: 2rem 0;
+                padding: 3rem 0 2rem;
                 margin-top: auto;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .footer::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, var(--bfar-blue), var(--ocean-blue), var(--coral-orange));
+            }
+            
+            .footer a {
+                color: white;
+                text-decoration: none;
+                transition: all 0.3s ease;
+            }
+            
+            .footer a:hover {
+                color: var(--coral-orange);
+                text-decoration: none;
+            }
+            
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+                margin-bottom: 1.5rem;
+                flex-wrap: wrap;
+            }
+            
+            .footer-links a {
+                position: relative;
+                padding: 0 0.5rem;
+            }
+            
+            .footer-links a:not(:last-child)::after {
+                content: '•';
+                position: absolute;
+                right: -1.25rem;
+                color: rgba(255, 255, 255, 0.3);
+            }
+            
+            .footer-copyright {
+                font-size: 0.9rem;
+                opacity: 0.7;
+                margin-top: 1.5rem;
             }
 
             .wave-animation {
@@ -473,7 +631,45 @@
             </footer>
         </div>
 
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap JS Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- AOS Animation JS -->
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+        
+        <!-- Custom JS -->
+        <script>
+            // Initialize AOS
+            document.addEventListener('DOMContentLoaded', function() {
+                AOS.init({
+                    duration: 800,
+                    easing: 'ease-in-out',
+                    once: true,
+                    mirror: false
+                });
+                
+                // Add smooth scrolling to all links
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        document.querySelector(this.getAttribute('href')).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    });
+                });
+                
+                // Add navbar background on scroll
+                const navbar = document.querySelector('.navbar');
+                if (navbar) {
+                    window.addEventListener('scroll', function() {
+                        if (window.scrollY > 50) {
+                            navbar.classList.add('navbar-scrolled');
+                        } else {
+                            navbar.classList.remove('navbar-scrolled');
+                        }
+                    });
+                }
+            });
+        </script>
     </body>
 </html>
