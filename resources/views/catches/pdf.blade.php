@@ -359,13 +359,21 @@
 
     <!-- Fish Photo -->
     @if($catch->image_path)
+    @php
+        // Get the full path to the image
+        $imagePath = storage_path('app/public/' . $catch->image_path);
+        // Convert image to base64 for embedding in PDF
+        $imageData = file_exists($imagePath) ? 'data:image/'.pathinfo($imagePath, PATHINFO_EXTENSION).';base64,'.base64_encode(file_get_contents($imagePath)) : null;
+    @endphp
+    @if($imageData)
     <div class="section">
         <div class="program-header">National Stock Assessment Program in Region 8</div>
         <div class="section-title">FISH PHOTO</div>
         <div class="photo-section">
-            <img src="{{ asset('storage/' . $catch->image_path) }}" alt="Fish Photo">
+            <img src="{{ $imageData }}" alt="Fish Photo" style="max-width: 100%; height: auto;">
         </div>
     </div>
+    @endif
     @endif
 
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
@@ -11,6 +12,19 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 // Include test routes
 require __DIR__.'/oauth-test.php';
 require __DIR__.'/test-oauth.php';
+
+// Protected routes that require authentication
+Route::middleware(['auth'])->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Fish Catch Routes
+    Route::get('/catches', [FishCatchController::class, 'index'])->name('catches.index');
+    Route::get('/catches/create', [FishCatchController::class, 'create'])->name('catches.create');
+    Route::post('/catches', [FishCatchController::class, 'store'])->name('catches.store');
+    Route::get('/catches/{catch}', [FishCatchController::class, 'show'])->name('catches.show');
+    Route::get('/catches/{catch}/pdf', [FishCatchController::class, 'generatePdf'])->name('catches.pdf');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +43,8 @@ Route::get('/', function () {
 
 // Registration form
 Route::get('/register', function () {
-    return view('auth.register');
+    $roles = DB::table('roles')->get();
+    return view('auth.register', compact('roles'));
 })->name('register');
 
 // Registration handler
@@ -40,12 +55,21 @@ Route::post('/register', function (Request $request) {
         'password' => 'required|min:6|confirmed',
         'role' => 'required|in:BFAR_PERSONNEL,REGIONAL_ADMIN',
     ]);
+    
+    // Get the role ID based on the role slug
+    $role = DB::table('roles')->where('slug', $request->role)->first();
+    
+    if (!$role) {
+        return back()->withErrors(['role' => 'Invalid role selected.'])->withInput();
+    }
+    
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
-        'role' => $request->role,
+        'role_id' => $role->id,
     ]);
+    
     Auth::login($user);
     return redirect('/dashboard');
 });
@@ -75,14 +99,20 @@ Route::post('/login', function (Request $request) {
 
 // Dashboard redirection based on role
 Route::middleware('auth')->get('/dashboard', function () {
-    $user = Auth::user();
-    if ($user->role === 'BFAR_PERSONNEL') {
+    $user = Auth::user()->load('role');
+    
+    if (!$user->role) {
+        abort(403, 'User role not found');
+    }
+    
+    if ($user->role->slug === 'BFAR_PERSONNEL') {
         return redirect('/dashboard/personnel');
-    } elseif ($user->role === 'REGIONAL_ADMIN') {
+    } elseif ($user->role->slug === 'REGIONAL_ADMIN') {
         return redirect('/dashboard/admin');
     }
-    abort(403);
-});
+    
+    abort(403, 'Unauthorized role');
+})->name('dashboard');
 
 // BFAR Personnel dashboard
 Route::middleware(['auth', 'role:BFAR_PERSONNEL'])->get('/dashboard/personnel', function () {
@@ -114,38 +144,52 @@ Route::middleware(['auth', 'role:REGIONAL_ADMIN'])->group(function () {
     })->name('admin.reports');
 });
 
-// Profile edit form
-Route::middleware('auth')->get('/profile/edit', function () {
-    return view('layouts.users.profile');
-})->name('profile.edit');
+// User Profile Routes
+Route::middleware('auth')->group(function () {
+    // Regular user profile
+    Route::get('/profile/edit', function () {
+        return view('layouts.users.profile');
+    })->name('profile.edit');
 
-// Profile update handler
-Route::middleware('auth')->put('/profile/update', function (Request $request) {
-    $user = Auth::user();
-    $request->validate([
-        'name' => 'required',
-        'address' => 'nullable|string',
-        'phone' => 'nullable|string',
-        'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-    $user->name = $request->name;
-    $user->address = $request->address;
-    $user->phone = $request->phone;
-    if ($request->hasFile('profile_image')) {
-        $image = $request->file('profile_image');
-        $imageName = time().'_'.$image->getClientOriginalName();
-        $image->storeAs('public/profile_images', $imageName);
-        $user->profile_image = $imageName;
-    }
-    $user->save();
-    return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
-})->name('profile.update');
+    Route::put('/profile/update', function (Request $request) {
+        $user = Auth::user();
+        $request->validate([
+            'name' => 'required',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        $user->name = $request->name;
+        $user->address = $request->address;
+        $user->phone = $request->phone;
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $imageName = time().'_'.$image->getClientOriginalName();
+            $image->storeAs('public/profile_images', $imageName);
+            $user->profile_image = $imageName;
+        }
+        $user->save();
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
+    })->name('profile.update');
+});
+
+// Admin Profile Routes
+Route::prefix('admin')->middleware(['auth', 'role:REGIONAL_ADMIN'])->group(function () {
+    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::put('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
+});
 
 // Login history route (placeholder)
 Route::middleware('auth')->get('/login-history', function () {
     // You can replace this with a real view or controller later
     return view('layouts.users.login-history');
 })->name('login.history');
+
+// Fish Catch Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/catch/create', [FishCatchController::class, 'create'])->name('catch.create');
+    Route::post('/catch', [FishCatchController::class, 'store'])->name('catch.store');
+});
 
 // Fish catch entry form
 Route::middleware('auth')->get('/catch/create', function () {

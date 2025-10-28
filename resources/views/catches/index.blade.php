@@ -48,6 +48,32 @@
     }
 
     .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+    }
+
+    .empty-state i {
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .pagination {
+        margin-bottom: 0;
+    }
+
+    .page-link {
+        color: #0d6efd;
+        border-color: #dee2e6;
+    }
+
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
         background-color: rgba(0, 0, 0, 0.015);
     }
 
@@ -86,11 +112,11 @@
         color: #dee2e6;
     }
 
-    /* Responsive table */
-    @media (max-width: 991.98px) {
+    /* Responsive table styles */
+    @media (max-width: 768px) {
         .table-responsive {
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
         
         .table thead {
@@ -105,37 +131,34 @@
         .table tr {
             margin-bottom: 1rem;
             border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            overflow: hidden;
+            border-radius: 0.25rem;
         }
         
         .table td {
             text-align: right;
             padding-left: 50%;
             position: relative;
-            border-bottom: 1px solid #f1f3f6;
+            border-bottom: 1px solid #dee2e6;
         }
         
         .table td::before {
             content: attr(data-label);
             position: absolute;
-            left: 1.5rem;
+            left: 1rem;
             width: 45%;
             padding-right: 1rem;
             text-align: left;
             font-weight: 600;
-            color: #495057;
-            text-transform: uppercase;
-            font-size: 0.7rem;
-            letter-spacing: 0.5px;
+            color: #6c757d;
         }
         
-        .btn-group {
-            justify-content: flex-end;
+        .table td:last-child {
+            border-bottom: 0;
         }
         
-        .btn-group .btn {
-            margin-left: 0.5rem;
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
     }
 
@@ -181,16 +204,23 @@
                     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
                         <div class="mb-3 mb-md-0">
                             <h4 class="card-title mb-1">
-                                <i class="bx bx-list-ul me-2"></i>My Fish Catch Records
+                                <i class='bx bx-list-ul me-2'></i>My Fish Catch Records
                             </h4>
                             <p class="card-subtitle">View and manage your submitted fish catch reports</p>
                         </div>
-                        <a href="{{ route('catch.create') }}" class="btn btn-primary">
-                            <i class="bx bx-plus me-1"></i>New Catch Report
+                        <a href="{{ route('catches.create') }}" class="btn btn-primary">
+                            <i class='bx bx-plus me-1'></i>New Catch Report
                         </a>
                     </div>
                 </div>
                 <div class="card-body p-0">
+                    @if(session('status'))
+                        <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
+                            {{ session('status') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
                     @if($catches->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
@@ -198,12 +228,14 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Date & Time</th>
-                                        <th>Region</th>
-                                        <th>Landing Center</th>
+                                        <th>Fisherman</th>
                                         <th>Species</th>
-                                        <th>Size</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Actions</th>
+                                        <th>Length</th>
+                                        <th>Weight</th>
+                                        <th>Region</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -214,27 +246,32 @@
                                         </td>
                                         <td data-label="Date & Time">
                                             <div class="d-flex flex-column">
-                                                <strong>{{ \Carbon\Carbon::parse($catch->date_sampling)->format('M d, Y') }}</strong>
+                                                <span class="fw-medium">{{ \Carbon\Carbon::parse($catch->date_sampling)->format('M d, Y') }}</span>
                                                 <small class="text-muted">{{ $catch->time_landing }}</small>
                                             </div>
                                         </td>
-                                        <td data-label="Region">
-                                            <span class="badge bg-info">{{ $catch->region }}</span>
-                                        </td>
-                                        <td data-label="Landing Center">{{ $catch->landing_center }}</td>
+                                        <td data-label="Fisherman">{{ $catch->fisherman_name }}</td>
                                         <td data-label="Species">
-                                            <div class="d-flex flex-column">
-                                                <strong>{{ $catch->species }}</strong>
-                                                @if($catch->scientific_name)
-                                                    <small class="text-muted">{{ $catch->scientific_name }}</small>
-                                                @endif
-                                            </div>
+                                            <span class="badge bg-label-primary">{{ $catch->species }}</span>
                                         </td>
-                                        <td data-label="Size">
-                                            <div class="d-flex flex-column">
-                                                <span>{{ number_format($catch->length_cm, 1) }} cm</span>
-                                                <small class="text-muted">{{ number_format($catch->weight_g, 1) }} g</small>
-                                            </div>
+                                        <td data-label="Length">{{ $catch->length_cm }} cm</td>
+                                        <td data-label="Weight">{{ $catch->weight_g }} g</td>
+                                        <td data-label="Region">
+                                            <span class="badge bg-label-info">{{ $catch->region }}</span>
+                                        </td>
+                                        <td data-label="Latitude">
+                                            @if($catch->fishingOperations->isNotEmpty() && $catch->fishingOperations->first()->latitude)
+                                                {{ number_format($catch->fishingOperations->first()->latitude, 6) }}
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
+                                        </td>
+                                        <td data-label="Longitude">
+                                            @if($catch->fishingOperations->isNotEmpty() && $catch->fishingOperations->first()->longitude)
+                                                {{ number_format($catch->fishingOperations->first()->longitude, 6) }}
+                                            @else
+                                                <span class="text-muted">-</span>
+                                            @endif
                                         </td>
                                         <td data-label="Status">
                                             @if($catch->image_path)

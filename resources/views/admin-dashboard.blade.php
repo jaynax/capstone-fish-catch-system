@@ -117,7 +117,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h3 class="card-title mb-0">{{ \App\Models\User::where('role', 'BFAR_PERSONNEL')->count() }}</h3>
+                            <h3 class="card-title mb-0">{{ \App\Models\User::where('role_id', 2)->count() }}</h3>
                             <p class="card-text">BFAR Personnel</p>
                         </div>
                         <div class="text-end">

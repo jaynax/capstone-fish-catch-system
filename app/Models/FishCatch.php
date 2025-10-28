@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Model;
 class FishCatch extends Model
 {
     use HasFactory;
+    
+    protected static function booted()
+    {
+        static::creating(function ($fishCatch) {
+            \Log::info('Creating FishCatch record', [
+                'attributes' => $fishCatch->attributes,
+                'original' => $fishCatch->original
+            ]);
+        });
+        
+        static::created(function ($fishCatch) {
+            \Log::info('FishCatch record created successfully', [
+                'id' => $fishCatch->id,
+                'attributes' => $fishCatch->attributes
+            ]);
+        });
+    }
 
     protected $table = 'catches';
 
@@ -15,6 +32,7 @@ class FishCatch extends Model
         // Fisherman Information
         'fisherman_registration_id',
         'fisherman_name',
+        'user_id',
         
         // General Information
         'region',
@@ -25,28 +43,18 @@ class FishCatch extends Model
         'fishing_ground',
         'weather_conditions',
         
-        // Boat Information
-        'boat_name',
-        'boat_type',
-        'boat_length',
-        'boat_width',
-        'boat_depth',
-        'gross_tonnage',
-        'horsepower',
-        'engine_type',
-        'fishermen_count',
+        // Fish Information
+        'species',
+        'scientific_name',
+        'length_cm',
+        'weight_g',
+        'sex',
+        'maturity',
+        'stomach_content',
+        'image_path',
         
-        // Fishing Operation Details
-        'fishing_gear_type',
-        'gear_specifications',
-        'hooks_hauls',
-        'net_line_length',
-        'soaking_time',
-        'mesh_size',
-        'days_fished',
-        'fishing_location',
-        'payao_used',
-        'fishing_effort_notes',
+        // Catch Details (stored as JSON)
+        'catch_details',
         
         // Catch Information
         'catch_type',
@@ -66,11 +74,11 @@ class FishCatch extends Model
         'bbox_width',
         'bbox_height',
         'pixels_per_cm',
+        'catch_datetime',
         
         // Legacy fields for compatibility
         'latitude',
         'longitude',
-        'catch_datetime',
         'gear_type',
         'catch_volume',
         'remarks',
@@ -98,5 +106,31 @@ class FishCatch extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the boat associated with the fish catch.
+     */
+    public function boat()
+    {
+        return $this->hasOne(Boat::class, 'catch_id');
+    }
+
+    /**
+     * Get the fishing operation associated with the fish catch.
+     */
+    public function fishingOperation() 
+    {
+        return $this->hasOne(FishingOperation::class, 'catch_id');
+    }
+    
+    public function boats()
+    {
+        return $this->hasMany(Boat::class);
+    }
+    
+    public function fishingOperations()
+    {
+        return $this->hasMany(FishingOperation::class);
     }
 }

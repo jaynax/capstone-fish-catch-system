@@ -62,98 +62,132 @@
                     </div>
 
                     <!-- Boat Information -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="bx bx-ship me-2"></i>Boat Information
-                            </h5>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Boat Name (F/B):</label>
-                            <p class="form-control-plaintext">{{ $catch->boat_name }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Boat Type:</label>
-                            <p class="form-control-plaintext">{{ $catch->boat_type }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Length (m):</label>
-                            <p class="form-control-plaintext">{{ number_format($catch->boat_length, 2) }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Width (m):</label>
-                            <p class="form-control-plaintext">{{ number_format($catch->boat_width, 2) }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Depth (m):</label>
-                            <p class="form-control-plaintext">{{ number_format($catch->boat_depth, 2) }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Gross Tonnage (GT):</label>
-                            <p class="form-control-plaintext">{{ $catch->gross_tonnage ? number_format($catch->gross_tonnage, 2) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Horsepower (HP):</label>
-                            <p class="form-control-plaintext">{{ $catch->horsepower ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Engine Type:</label>
-                            <p class="form-control-plaintext">{{ $catch->engine_type ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Number of Fishermen:</label>
-                            <p class="form-control-plaintext">{{ $catch->fishermen_count }}</p>
-                        </div>
-                    </div>
+                    @if($catch->boats->count() > 0)
+                        @foreach($catch->boats as $index => $boat)
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2 mb-3">
+                                        <i class="bx bx-ship me-2"></i>Boat Information #{{ $index + 1 }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Boat Name (F/B):</label>
+                                    <p class="form-control-plaintext">{{ $boat->boat_name }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Boat Type:</label>
+                                    <p class="form-control-plaintext">{{ $boat->boat_type }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Length (m):</label>
+                                    <p class="form-control-plaintext">{{ number_format($boat->boat_length, 2) }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Width (m):</label>
+                                    <p class="form-control-plaintext">{{ number_format($boat->boat_width, 2) }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Depth (m):</label>
+                                    <p class="form-control-plaintext">{{ number_format($boat->boat_depth, 2) }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Gross Tonnage (GT):</label>
+                                    <p class="form-control-plaintext">{{ $boat->gross_tonnage ? number_format($boat->gross_tonnage, 2) : 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Horsepower (HP):</label>
+                                    <p class="form-control-plaintext">{{ $boat->horsepower ?: 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Engine Type:</label>
+                                    <p class="form-control-plaintext">{{ $boat->engine_type ?: 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Number of Fishermen:</label>
+                                    <p class="form-control-plaintext">{{ $boat->fishermen_count }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="alert alert-warning">No boat information available.</div>
+                    @endif
 
                     <!-- Fishing Operation Details -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h5 class="border-bottom pb-2 mb-3">
-                                <i class="bx bx-anchor me-2"></i>Fishing Operation Details
-                            </h5>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Fishing Gear Type:</label>
-                            <p class="form-control-plaintext">{{ $catch->fishing_gear_type }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Days Fished:</label>
-                            <p class="form-control-plaintext">{{ $catch->days_fished }}</p>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label fw-bold">Gear Specifications:</label>
-                            <p class="form-control-plaintext">{{ $catch->gear_specifications ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Hooks/Hauls:</label>
-                            <p class="form-control-plaintext">{{ $catch->hooks_hauls ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Net/Line Length (m):</label>
-                            <p class="form-control-plaintext">{{ $catch->net_line_length ? number_format($catch->net_line_length, 2) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Soaking Time (hrs):</label>
-                            <p class="form-control-plaintext">{{ $catch->soaking_time ? number_format($catch->soaking_time, 2) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label fw-bold">Mesh Size (cm):</label>
-                            <p class="form-control-plaintext">{{ $catch->mesh_size ? number_format($catch->mesh_size, 2) : 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Fishing Location:</label>
-                            <p class="form-control-plaintext">{{ $catch->fishing_location ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Payao Used:</label>
-                            <p class="form-control-plaintext">{{ $catch->payao_used ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label fw-bold">Fishing Effort Notes:</label>
-                            <p class="form-control-plaintext">{{ $catch->fishing_effort_notes ?: 'N/A' }}</p>
-                        </div>
-                    </div>
+                    @if($catch->fishingOperations->count() > 0)
+                        @foreach($catch->fishingOperations as $index => $operation)
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h5 class="border-bottom pb-2 mb-3">
+                                        <i class="bx bx-anchor me-2"></i>Fishing Operation #{{ $index + 1 }}
+                                    </h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Fishing Gear Type:</label>
+                                    <p class="form-control-plaintext">{{ $operation->fishing_gear_type }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Days Fished:</label>
+                                    <p class="form-control-plaintext">{{ $operation->days_fished }}</p>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Gear Specifications:</label>
+                                    <p class="form-control-plaintext">{{ $operation->gear_specifications ?: 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Hooks/Hauls:</label>
+                                    <p class="form-control-plaintext">{{ $operation->hooks_hauls ?: 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Net/Line Length (m):</label>
+                                    <p class="form-control-plaintext">{{ $operation->net_line_length ? number_format($operation->net_line_length, 2) : 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Soaking Time (hrs):</label>
+                                    <p class="form-control-plaintext">{{ $operation->soaking_time ? number_format($operation->soaking_time, 2) : 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Mesh Size (cm):</label>
+                                    <p class="form-control-plaintext">{{ $operation->mesh_size ? number_format($operation->mesh_size, 2) : 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Latitude:</label>
+                                    <p class="form-control-plaintext">
+                                        {{ $operation->latitude ? number_format($operation->latitude, 6) : 'N/A' }}
+                                    </p>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label fw-bold">Longitude:</label>
+                                    <p class="form-control-plaintext">
+                                        {{ $operation->longitude ? number_format($operation->longitude, 6) : 'N/A' }}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Map Location:</label>
+                                    <p class="form-control-plaintext">
+                                        @if($operation->latitude && $operation->longitude)
+                                            <a href="https://www.google.com/maps?q={{ $operation->latitude }},{{ $operation->longitude }}" 
+                                               target="_blank" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="bx bx-map"></i> View on Map
+                                            </a>
+                                        @else
+                                            N/A
+                                        @endif
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Payao Used:</label>
+                                    <p class="form-control-plaintext">{{ $operation->payao_used ?: 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">Fishing Effort Notes:</label>
+                                    <p class="form-control-plaintext">{{ $operation->fishing_effort_notes ?: 'N/A' }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="alert alert-warning">No fishing operation information available.</div>
+                    @endif
 
                     <!-- Catch Information -->
                     <div class="row mb-4">

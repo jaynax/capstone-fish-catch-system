@@ -3,11 +3,11 @@
     <div class="logo d-flex align-items-center" style="padding: 20px; text-align: center;">
         <a href="{{ url('/') }}" class="app-brand-link d-flex align-items-center">
             <span class="app-brand-logo demo"
-                  style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;">
+                  style="width: 50px; height: 50px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;">
                 <img src="{{ asset('/assets/img/icons/brands/BFAR.png') }}" 
                      alt="BFAR Logo" 
                      class="img-fluid" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
+                     style="width: 100%; height: 100%; object-fit: cover;"
             </span>
         </a>
     </div>
@@ -49,7 +49,7 @@
 
         <!-- Edit Profile -->
         <li class="menu-item">
-            <a href="{{ route('profile.edit') }}" class="menu-link" style="background-color: #e0f7fa; border-radius: 8px; margin-top: 10px;">
+            <a href="{{ route('admin.profile.edit') }}" class="menu-link" style="background-color: #e0f7fa; border-radius: 8px; margin-top: 10px;">
                 <i class="menu-icon bx bx-user-circle"></i>
                 <span>Edit Profile</span>
             </a>

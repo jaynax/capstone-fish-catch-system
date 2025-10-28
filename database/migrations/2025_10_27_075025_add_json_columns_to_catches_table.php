@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('catches', function (Blueprint $table) {
-            $table->string('fisherman_registration_id')->after('id')->nullable();
-            $table->string('fisherman_name')->after('fisherman_registration_id')->nullable();
+            $table->json('boat_info')->nullable()->after('weather_conditions');
+            $table->json('fishing_operation')->nullable()->after('boat_info');
+            $table->json('catch_details')->nullable()->after('fishing_operation');
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('catches', function (Blueprint $table) {
-            $table->dropColumn(['fisherman_registration_id', 'fisherman_name']);
+            $table->dropColumn(['boat_info', 'fishing_operation', 'catch_details']);
         });
     }
 };

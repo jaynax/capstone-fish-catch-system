@@ -56,8 +56,11 @@
                             <label for="role" class="form-label">Role</label>
                             <select class="form-control @error('role') is-invalid @enderror" id="role" name="role" required>
                                 <option value="">Select Role</option>
-                                <option value="BFAR_PERSONNEL" {{ old('role') == 'BFAR_PERSONNEL' ? 'selected' : '' }}>BFAR Personnel</option>
-                                <option value="REGIONAL_ADMIN" {{ old('role') == 'REGIONAL_ADMIN' ? 'selected' : '' }}>Regional Office Admin</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->slug }}" {{ old('role') == $role->slug ? 'selected' : '' }}>
+                                        {{ $role->name }}
+                                    </option>
+                                @endforeach
                             </select>
                             @error('role')
                                 <span class="invalid-feedback" role="alert">

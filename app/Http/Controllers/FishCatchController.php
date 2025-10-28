@@ -4,99 +4,342 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FishCatch;
+use App\Models\Boat;
+use App\Models\FishingOperation;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class FishCatchController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $catches = FishCatch::with(['user', 'boats', 'fishingOperations'])
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+            
+        return view('catches.index', compact('catches'));
+    }
     private $mlApiUrl = 'http://localhost:5000';
+    
+    /**
+     * Process fish image and return species and size estimation
+     */
+    /**
+     * Show the form for creating a new fish catch.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function create()
+    {
+        return view('catch.create');
+    }
+
+    /**
+     * Display the specified fish catch.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $catch = FishCatch::with(['user', 'boats', 'fishingOperations'])
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+            
+        return view('catches.show', compact('catch'));
+    }
+
+    /**
+     * Store a newly created fish catch in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+
+
+    /**
+     * Process fish image and return species and size estimation
+     */
+    public function processFishImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|max:10240', // Max 10MB
+        ]);
+
+        try {
+            // Save the uploaded file temporarily
+            $image = $request->file('image');
+            $imagePath = $image->store('temp', 'public');
+            
+            // Call the ML API for prediction
+            $response = Http::attach(
+                'image', 
+                file_get_contents($image->getRealPath()),
+                $image->getClientOriginalName()
+            )->post($this->mlApiUrl . '/predict');
+
+            if (!$response->successful()) {
+                throw new \Exception('Failed to process image with ML API');
+            }
+
+            $result = $response->json();
+            
+            // Delete the temporary file
+            Storage::disk('public')->delete($imagePath);
+            
+            return response()->json($result);
+            
+        } catch (\Exception $e) {
+            // Clean up temp file if it exists
+            if (isset($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error processing image: ' . $e->getMessage(),
+                'error_details' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
 
     public function store(Request $request)
     {
-        // Check if we're in automatic mode (image is provided) or manual mode
-        $isAutoMode = $request->hasFile('image') && $request->file('image')->isValid();
+        // Debug: Log the request data
+        \Log::info('Store request data:', $request->all());
+        \Log::info('Starting fish catch submission', ['input' => $request->except(['_token', 'image'])]);
         
-        $validationRules = [
-            // Fisherman Information
-            'fisherman_registration_id' => 'required|string|max:255',
-            'fisherman_name' => 'required|string|max:255',
-            
-            // General Information
-            'region' => 'required|string|max:255',
-            'landing_center' => 'required|string|max:255',
-            'date_sampling' => 'required|date',
-            'time_landing' => 'required|date_format:H:i',
-            'enumerators' => 'required|string|max:255',
-            'fishing_ground' => 'required|string|max:255',
-            'weather_conditions' => 'required|string|max:255',
-            
-            // Boat Information
-            'boat_name' => 'required|string|max:255',
-            'boat_type' => 'required|string|max:255',
-            'boat_length' => 'required|numeric|min:0',
-            'boat_width' => 'required|numeric|min:0',
-            'boat_depth' => 'required|numeric|min:0',
-            'gross_tonnage' => 'nullable|numeric|min:0',
-            'horsepower' => 'nullable|integer|min:0',
-            'engine_type' => 'nullable|string|max:255',
-            'fishermen_count' => 'required|integer|min:1',
-            
-            // Fishing Operation Details
-            'fishing_gear_type' => 'required|string|max:255',
-            'gear_specifications' => 'nullable|string',
-            'hooks_hauls' => 'nullable|integer|min:0',
-            'net_line_length' => 'nullable|numeric|min:0',
-            'soaking_time' => 'nullable|numeric|min:0',
-            'mesh_size' => 'nullable|numeric|min:0',
-            'days_fished' => 'required|integer|min:1',
-            'fishing_location' => 'nullable|string|max:255',
-            'payao_used' => 'nullable|string|max:255',
-            'fishing_effort_notes' => 'nullable|string',
-            
-            // Catch Information
-            'catch_type' => 'required|string|max:255',
-            'total_catch_kg' => 'required|numeric|min:0',
-            'subsample_taken' => 'nullable|string|max:255',
-            'subsample_weight' => 'nullable|numeric|min:0',
-            'below_legal_size' => 'nullable|string|max:255',
-            'below_legal_species' => 'nullable|string|max:255',
-            
-            // AI Species Recognition & Size Estimation
-            'species' => 'required|string|max:255',
-            'scientific_name' => 'nullable|string|max:255',
-            'length_cm' => 'required|numeric|min:0',
-            'weight_g' => 'required|numeric|min:0',
-            'confidence_score' => 'nullable|string|max:255',
-            'detection_confidence' => 'nullable|string|max:255',
-            'bbox_width' => 'nullable|integer|min:0',
-            'bbox_height' => 'nullable|integer|min:0',
-            'pixels_per_cm' => 'nullable|numeric|min:0',
-        ];
+        try {
+            // Validate the request data
+            $validatedData = $request->validate([
+                // Fisherman Information
+                'fisherman_registration_id' => 'required|string|max:255',
+                'fisherman_name' => 'required|string|max:255',
+                
+                // General Information
+                'region' => 'required|string|max:255',
+                'landing_center' => 'required|string|max:255',
+                'date_sampling' => 'required|date',
+                'time_landing' => 'required|date_format:H:i',
+                'enumerators' => 'required|string|max:255',
+                'fishing_ground' => 'required|string|max:255',
+                'weather_conditions' => 'required|string|in:Sunny,Cloudy,Rainy,Stormy,Calm,Windy',
+                
+                // Boat Information
+                'boats' => 'required|array|min:1',
+                'boats.*.boat_name' => 'required|string|max:255',
+                'boats.*.boat_type' => 'required|string|in:Motorized,Non-motorized',
+                'boats.*.boat_length' => 'required|numeric|min:0',
+                'boats.*.boat_width' => 'required|numeric|min:0',
+                'boats.*.boat_depth' => 'required|numeric|min:0',
+                'boats.*.gross_tonnage' => 'nullable|numeric|min:0',
+                'boats.*.horsepower' => 'nullable|numeric|min:0',
+                'boats.*.engine_type' => 'nullable|string|max:255',
+                'boats.*.fishermen_count' => 'required|integer|min:1',
+                
+                // Fishing Operation Details - Update to match form structure
+                'fishing_ops' => 'required|array|min:1',
+                'fishing_ops.*.fishing_gear_type' => 'required|string|in:Gill Net,Drift Gill Net,Set Gill Net,Trammel Net,Beach Seine,Purse Seine,Ring Net,Danish Seine,Trawl,Midwater Trawl,Pair Trawl,Baby Trawl,Bagnet,Handline,Multiple Handline,Troll Line,Longline,Bottom Set Longline,Drift Longline,Pole and Line,Jigging,Fish Pot,Lobster Pot,Crab Pot,Bamboo Trap,Funnel Net,Fyke Net,Spear,Harpoon,Scoop Net,Cast Net,Drive-in Net,Lift Net',
+                'fishing_ops.*.gear_specifications' => 'nullable|string',
+                'fishing_ops.*.hooks_hauls' => 'nullable|integer|min:0',
+                'fishing_ops.*.net_line_length' => 'nullable|numeric|min:0',
+                'fishing_ops.*.soaking_time' => 'nullable|numeric|min:0',
+                'fishing_ops.*.mesh_size' => 'nullable|numeric|min:0',
+                'fishing_ops.*.days_fished' => 'required|integer|min:1',
+                'fishing_ops.*.latitude' => 'nullable|numeric|between:-90,90',
+                'fishing_ops.*.longitude' => 'nullable|numeric|between:-180,180',
+                'fishing_ops.*.payao_used' => 'nullable|string|in:Yes,No',
+                'fishing_ops.*.fishing_effort_notes' => 'nullable|string',
+                
+                // Catch Information - Flat fields (not in an array)
+                'catch_type' => 'required|string|in:Complete,Incomplete,Partly Sold',
+                'total_catch_kg' => 'required|numeric|min:0',
+                'subsample_taken' => 'required|string|in:Yes,No',
+                'subsample_weight' => 'nullable|numeric|min:0',
+                'below_legal_size' => 'required|string|in:Yes,No',
+                'below_legal_species' => 'nullable|string|max:255',
+                
+                // AI Species Recognition & Size Estimation
+                'species' => 'required|string|max:255',
+                'scientific_name' => 'nullable|string|max:255',
+                'length_cm' => 'required|numeric|min:0',
+                'weight_g' => 'required|numeric|min:0',
+                'confidence_score' => 'nullable|string|max:255',
+                
+                // Image (if any)
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            ]);
 
-        // Add image validation only if in automatic mode
-        if ($isAutoMode) {
-            $validationRules['image'] = 'required|image|mimes:jpeg,png,jpg,gif|max:10240'; // 10MB max
+            // Start database transaction
+            \DB::beginTransaction();
+
+            try {
+                // Set user ID
+                $validatedData['user_id'] = auth()->id();
+
+                // Set catch_datetime from date_sampling and time_landing
+                $validatedData['catch_datetime'] = $validatedData['date_sampling'] . ' ' . $validatedData['time_landing'];
+
+                // Handle image upload if present
+                if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                    $imagePath = $request->file('image')->store('catches', 'public');
+                    $validatedData['image_path'] = $imagePath;
+                }
+
+                // Extract boats and fishing_ops data before creating FishCatch
+                $boatsData = $validatedData['boats'] ?? [];
+                $fishingOpsData = $validatedData['fishing_ops'] ?? [];
+                
+                // Convert 'Yes'/'No' to boolean for database fields
+                $validatedData['subsample_taken'] = isset($validatedData['subsample_taken']) && 
+                    ($validatedData['subsample_taken'] === 'Yes' || $validatedData['subsample_taken'] === '1' || $validatedData['subsample_taken'] === true) ? 1 : 0;
+                    
+                $validatedData['below_legal_size'] = isset($validatedData['below_legal_size']) && 
+                    ($validatedData['below_legal_size'] === 'Yes' || $validatedData['below_legal_size'] === '1' || $validatedData['below_legal_size'] === true) ? 1 : 0;
+                
+                // Remove arrays from validated data before creating FishCatch
+                unset($validatedData['boats'], $validatedData['fishing_ops']);
+
+                // Log before creating fish catch
+                \Log::info('Creating fish catch record', ['data' => $validatedData]);
+                
+                // Create the fish catch record
+                try {
+                    // Create the fish catch record
+                    $fishCatch = FishCatch::create($validatedData);
+                    \Log::info('Fish catch record created', ['id' => $fishCatch->id]);
+                    
+                    // Create boat records
+                    if (!empty($boatsData)) {
+                        foreach ($boatsData as $boatData) {
+                            // Ensure we're using the correct column name (fish_catch_id)
+                            $boat = new Boat($boatData);
+                            $boat->fish_catch_id = $fishCatch->id; // Explicitly set the fish_catch_id
+                            $boat->save();
+                            \Log::info('Boat created', ['id' => $boat->id, 'fish_catch_id' => $fishCatch->id]);
+                        }
+                    }
+                    
+                    // Create fishing operation records
+                    if (!empty($fishingOpsData)) {
+                        foreach ($fishingOpsData as $opData) {
+                            // Ensure we're using the correct column name (fish_catch_id)
+                            $fishingOp = new FishingOperation($opData);
+                            $fishingOp->fish_catch_id = $fishCatch->id; // Explicitly set the fish_catch_id
+                            $fishingOp->save();
+                            \Log::info('Fishing operation created', 
+                                ['id' => $fishingOp->id, 'fish_catch_id' => $fishCatch->id]);
+                        }
+                    }
+                    
+                    // Commit the transaction
+                    \DB::commit();
+                    
+                    \Log::info('Fish catch submission completed successfully', 
+                        ['id' => $fishCatch->id]);
+                        
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Fish catch recorded successfully!',
+                        'redirect' => route('catches.show', $fishCatch->id)
+                    ]);
+                } catch (\Exception $e) {
+                    \Log::error('Error creating fish catch record', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                        'validated_data' => $validatedData
+                    ]);
+                    throw $e;
+                }
+
+                // Save boats data
+                \Log::info('Saving boats data', ['count' => count($boatsData), 'data' => $boatsData]);
+                foreach ($boatsData as $boatData) {
+                    $boat = $fishCatch->boats()->create($boatData);
+                    \Log::info('Boat record created', ['id' => $boat->id]);
+                }
+
+                // Save fishing operations data
+                \Log::info('Saving fishing operations data', ['count' => count($fishingOpsData), 'data' => $fishingOpsData]);
+                foreach ($fishingOpsData as $opData) {
+                    // Combine lat/lng into fishing_location if both exist
+                    if (!empty($opData['latitude']) && !empty($opData['longitude'])) {
+                        $opData['fishing_location'] = $opData['latitude'] . ',' . $opData['longitude'];
+                    }
+                    $operation = $fishCatch->fishingOperations()->create($opData);
+                    \Log::info('Fishing operation record created', ['id' => $operation->id]);
+                }
+
+                // Commit the transaction
+                \DB::commit();
+
+                // Log successful submission
+                \Log::info('Fish catch report submitted successfully', [
+                    'fish_catch_id' => $fishCatch->id,
+                    'user_id' => auth()->id(),
+                    'fisherman_name' => $validatedData['fisherman_name']
+                ]);
+
+                // Return success response with consistent format
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Fish catch recorded successfully!',
+                    'redirect' => route('catches.index') // Changed to redirect to index instead of show
+                ]);
+
+            } catch (\Exception $e) {
+                // Rollback the transaction on error
+                \DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors
+            \Log::warning('Validation failed in FishCatchController@store', [
+                'errors' => $e->errors(),
+                'user_id' => auth()->id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+                'message' => 'Please check the form for errors and try again.'
+            ], 422);
+            
+        } catch (\Exception $e) {
+            // Log the full error with trace
+            \Log::error('Error in FishCatchController@store', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'code' => $e->getCode(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'input_data' => $request->except(['_token', 'image'])
+            ]);
+            
+            // Return detailed error in development, generic message in production
+            $message = config('app.debug') 
+                ? 'Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine()
+                : 'We encountered an error while processing your request. Please try again.';
+                
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'error' => config('app.debug') ? [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'exception' => get_class($e)
+                ] : null
+            ], 500);
         }
-
-        $data = $request->validate($validationRules);
-
-        // Set user ID
-        $data['user_id'] = auth()->id();
-
-        // Handle image upload only if in automatic mode
-        if ($isAutoMode && $request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('catches', 'public');
-            $data['image_path'] = $imagePath;
-        }
-
-        // Set catch_datetime from date_sampling and time_landing
-        $data['catch_datetime'] = $data['date_sampling'] . ' ' . $data['time_landing'];
-
-        // Create the fish catch record
-        $fishCatch = FishCatch::create($data);
-
-        return redirect()->route('personnel-dashboard')->with('success', 'Fish catch report submitted successfully!');
     }
 
     public function predict(Request $request)
@@ -240,21 +483,6 @@ class FishCatchController extends Controller
                 'message' => 'Cannot connect to ML API: ' . $e->getMessage()
             ], 503);
         }
-    }
-
-    public function index()
-    {
-        $catches = FishCatch::with('user')
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-        
-        return view('catches.index', compact('catches'));
-    }
-
-    public function show(FishCatch $catch)
-    {
-        // Ensure user can only view their own catches
         if ($catch->user_id !== auth()->id() && auth()->user()->role !== 'REGIONAL_ADMIN') {
             abort(403);
         }
@@ -269,7 +497,16 @@ class FishCatchController extends Controller
             abort(403);
         }
 
-        // For now, return the PDF view as HTML that can be printed
-        return view('catches.pdf', compact('catch'));
+        // Generate PDF using the correct facade
+        $pdf = \PDF::loadView('catches.pdf', compact('catch'));
+        
+        // Set paper size and orientation
+        $pdf->setPaper('a4', 'portrait');
+        
+        // Generate a filename
+        $filename = 'BFAR_Fish_Catch_Report_' . $catch->id . '_' . now()->format('Y-m-d') . '.pdf';
+        
+        // Download the PDF
+        return $pdf->download($filename);
     }
 }

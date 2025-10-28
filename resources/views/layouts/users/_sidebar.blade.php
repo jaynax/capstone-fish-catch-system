@@ -1,18 +1,71 @@
+<style>
+    /* Responsive sidebar styles */
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .logo-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #ddd;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .logo-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    @media (max-width: 1199.98px) {
+        .logo-wrapper {
+            width: 60px;
+            height: 60px;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .logo-wrapper {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .menu-inner {
+            margin-top: 90px !important;
+        }
+    }
+    
+    /* Hover effects */
+    .menu-link {
+        transition: all 0.2s ease;
+        margin: 4px 0;
+    }
+    
+    .menu-link:hover {
+        transform: translateX(5px);
+    }
+</style>
+
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
-    <div class="logo" style="position: fixed; top: 20px; left: 20px; z-index: 1000;">
-        <a href="{{ url('/') }}" class="app-brand-link d-flex align-items-center">
-            <span class="app-brand-logo demo" 
-                  style="width: 140px; height: 140px; border-radius: 50%; overflow: hidden; border: 2px solid #ddd; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center;">
+    <div class="logo-container">
+        <a href="{{ url('/') }}" class="app-brand-link">
+            <div class="logo-wrapper">
                 <img src="{{ asset('/assets/img/icons/brands/BFAR.png') }}" 
                      alt="BFAR Logo" 
-                     class="img-fluid" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
-           
+                     class="img-fluid">
+            </div>
+        </a>
     </div>
 
     <div class="menu-inner-shadow"></div>
 
-    <ul class="menu-inner py-1" style="margin-top: 160px;">
+    <ul class="menu-inner py-1" style="margin-top: 1.5rem; padding: 0 1rem;">
         <!-- Dashboard -->
         <li class="menu-item">
             <a href="{{ route('personnel-dashboard') }}" class="menu-link">
@@ -51,13 +104,6 @@
             </a>
         </li>
 
-        <!-- Login History -->
-        <li class="menu-item">
-            <a href="{{ route('login.history') }}" class="menu-link" style="background-color: #f0f0f0; border-radius: 8px; margin-top: 10px;">
-                <i class="menu-icon bx bx-history"></i>
-                <span>Login History</span>
-            </a>
-        </li>
 
         <!-- Logout -->
         <li class="menu-item">
