@@ -5,106 +5,140 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BFAR Fish Catch Report #{{ $catch->id }}</title>
     <style>
+        @page {
+            margin: 1.5cm 2cm;
+            @top-center {
+                content: "BUREAU OF FISHERIES AND AQUATIC RESOURCES";
+                font-size: 12px;
+                font-weight: bold;
+            }
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 10px;
+            }
+        }
+
         @media print {
             body { 
                 margin: 0;
-                padding: 15mm;
+                padding: 0;
+                font-family: 'Arial', sans-serif;
+                color: #000;
+                background: #fff;
+                line-height: 1.5;
             }
             .no-print { 
-                display: none; 
+                display: none !important; 
             }
             .page-break { 
-                page-break-before: always; 
+                page-break-before: always;
+                margin-top: 2cm;
             }
             .section {
-                margin: 0 0 20mm 0;
+                margin: 0 0 20px 0;
+                page-break-inside: avoid;
             }
             .section:last-child {
-                margin-bottom: 0;
+                page-break-after: auto;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
             }
         }
         
         body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-family: 'Arial', sans-serif;
+            font-size: 11px;
+            line-height: 1.5;
             margin: 0;
-            padding: 20px;
-            color: #333;
-            background: white;
+            padding: 0;
+            color: #000;
+            background: #fff;
         }
         
         .header {
             text-align: center;
-            border-bottom: 2px solid #333;
-            padding-bottom: 10px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 15px;
             margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .logo {
+            position: absolute;
+            left: 10px;
+            top: 0;
+            max-height: 70px;
         }
         
         .header h1 {
-            margin: 0;
-            font-size: 18px;
+            margin: 5px 0 0 0;
+            font-size: 16px;
             font-weight: bold;
+            color: #003366;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .header p {
-            margin: 5px 0;
-            font-size: 12px;
+            margin: 3px 0;
+            font-size: 11px;
+            color: #333;
         }
         
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             page-break-inside: avoid;
-            page-break-after: always;
-        }
-        
-        .section:last-child {
-            page-break-after: auto;
-        }
-        
-        .section-title {
-            font-size: 14px;
-            font-weight: bold;
-            background-color: #f0f0f0;
-            padding: 8px 10px;
-            margin: 15px 0 10px 0;
-            border: 1px solid #333;
-            text-align: center;
         }
         
         .program-header {
             text-align: center;
             font-weight: bold;
-            font-size: 14px;
-            margin: 20px 0 5px 0;
-            padding: 5px;
-            background-color: #f0f0f0;
-            border: 1px solid #333;
-            border-bottom: none;
+            font-size: 13px;
+            margin: 25px 0 5px 0;
+            padding: 8px 10px;
+            background-color: #003366;
+            color: white;
+            border: 1px solid #002244;
+            border-radius: 3px 3px 0 0;
         }
         
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 12px;
+            margin: 0 0 15px 0;
+            font-size: 10px;
+            border: 1px solid #ddd;
         }
         
         table.data-table th, 
         table.data-table td {
-            border: 1px solid #333;
-            padding: 6px 8px;
-            vertical-align: top;
+            border: 1px solid #ddd;
+            padding: 5px 8px;
+            vertical-align: middle;
+            line-height: 1.3;
         }
         
         table.data-table th {
-            background-color: #f5f5f5;
+            background-color: #f0f7ff;
+            color: #003366;
+            font-weight: bold;
             text-align: left;
-            width: 30%;
+            font-size: 10px;
+            padding: 7px 8px;
+            border-bottom: 2px solid #003366;
         }
         
-        table.data-table td {
-            width: 70%;
+        table.data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        table.data-table tr:hover {
+            background-color: #f1f1f1;
         }
         
         .photo-section {
@@ -163,14 +197,18 @@
     </button>
 
     <div class="header">
-        <h1>BFAR FISH CATCH MONITORING FORM</h1>
+        <img src="{{ public_path('assets/img/icons/brands/BFAR.png') }}" alt="BFAR Logo" class="logo" style="width: 80px; height: auto;">
+        <h1>BUREAU OF FISHERIES AND AQUATIC RESOURCES</h1>
         <p>National Stock Assessment Program (NSAP)</p>
-        <p>Report ID: #{{ $catch->id }} | Date: {{ \Carbon\Carbon::parse($catch->date_sampling)->format('F d, Y') }}</p>
+        <p>Region VIII - Eastern Visayas</p>
+        <p style="margin-top: 10px; font-weight: bold;">FISH CATCH MONITORING FORM</p>
+        <p>Report ID: NSAP-{{ strtoupper(substr($catch->region, 0, 3)) }}-{{ $catch->id }} | Date Generated: {{ now()->format('F d, Y h:i A') }}</p>
+        <p>Date of Catch: {{ \Carbon\Carbon::parse($catch->date_sampling)->format('F d, Y') }}</p>
     </div>
 
     <!-- General Information -->
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">GENERAL INFORMATION</div>
         <table class="data-table">
             <tr>
@@ -202,85 +240,109 @@
 
     <!-- Boat Information -->
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">BOAT INFORMATION</div>
-        <table class="data-table">
-            <tr>
-                <th>Boat Name (F/B):</th>
-                <td>{{ $catch->boat_name }}</td>
-                <th>Boat Type:</th>
-                <td>{{ $catch->boat_type }}</td>
-            </tr>
-            <tr>
-                <th>Length (m):</th>
-                <td>{{ number_format($catch->boat_length, 2) }}</td>
-                <th>Width (m):</th>
-                <td>{{ number_format($catch->boat_width, 2) }}</td>
-            </tr>
-            <tr>
-                <th>Depth (m):</th>
-                <td>{{ number_format($catch->boat_depth, 2) }}</td>
-                <th>Gross Tonnage (GT):</th>
-                <td>{{ $catch->gross_tonnage ? number_format($catch->gross_tonnage, 2) : 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Horsepower (HP):</th>
-                <td>{{ $catch->horsepower ?: 'N/A' }}</td>
-                <th>Engine Type:</th>
-                <td>{{ $catch->engine_type ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Number of Fishermen:</th>
-                <td colspan="3">{{ $catch->fishermen_count }}</td>
-            </tr>
-        </table>
+        
+        @if($catch->boats->count() > 0)
+            @foreach($catch->boats as $index => $boat)
+                <h4 style="margin: 15px 0 10px 0; font-weight: bold;">Boat #{{ $index + 1 }}</h4>
+                <table class="data-table">
+                    <tr>
+                        <th>Boat Name (F/B):</th>
+                        <td>{{ $boat->boat_name ?? 'N/A' }}</td>
+                        <th>Boat Type:</th>
+                        <td>{{ $boat->boat_type ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Length (m):</th>
+                        <td>{{ $boat->boat_length ? number_format($boat->boat_length, 2) : 'N/A' }}</td>
+                        <th>Width (m):</th>
+                        <td>{{ $boat->boat_width ? number_format($boat->boat_width, 2) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Depth (m):</th>
+                        <td>{{ $boat->boat_depth ? number_format($boat->boat_depth, 2) : 'N/A' }}</td>
+                        <th>Gross Tonnage (GT):</th>
+                        <td>{{ $boat->gross_tonnage ? number_format($boat->gross_tonnage, 2) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Horsepower (HP):</th>
+                        <td>{{ $boat->horsepower ?? 'N/A' }}</td>
+                        <th>Engine Type:</th>
+                        <td>{{ $boat->engine_type ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Number of Fishermen:</th>
+                        <td colspan="3">{{ $boat->fishermen_count ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+                @if(!$loop->last)
+                    <div style="page-break-before: always;"></div>
+                @endif
+            @endforeach
+        @else
+            <p>No boat information available.</p>
+        @endif
     </div>
 
     <!-- Fishing Operation Details -->
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">FISHING OPERATION DETAILS</div>
-        <table class="data-table">
-            <tr>
-                <th>Fishing Gear Type:</th>
-                <td>{{ $catch->fishing_gear_type }}</td>
-                <th>Days Fished:</th>
-                <td>{{ $catch->days_fished }}</td>
-            </tr>
-            <tr>
-                <th>Gear Specifications:</th>
-                <td colspan="3">{{ $catch->gear_specifications ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Hooks/Hauls:</th>
-                <td>{{ $catch->hooks_hauls ?: 'N/A' }}</td>
-                <th>Net/Line Length (m):</th>
-                <td>{{ $catch->net_line_length ? number_format($catch->net_line_length, 2) : 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Soaking Time (hrs):</th>
-                <td>{{ $catch->soaking_time ? number_format($catch->soaking_time, 2) : 'N/A' }}</td>
-                <th>Mesh Size (cm):</th>
-                <td>{{ $catch->mesh_size ? number_format($catch->mesh_size, 2) : 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Fishing Location:</th>
-                <td colspan="3">{{ $catch->fishing_location ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Payao Used:</th>
-                <td colspan="3">{{ $catch->payao_used ?: 'N/A' }}</td>
-            </tr>
-            <tr>
-                <th>Fishing Effort Notes:</th>
-                <td colspan="3">{{ $catch->fishing_effort_notes ?: 'N/A' }}</td>
-            </tr>
-        </table>
+        
+        @if($catch->fishingOperations->count() > 0)
+            @foreach($catch->fishingOperations as $index => $operation)
+                <h4 style="margin: 15px 0 10px 0; font-weight: bold;">Operation #{{ $index + 1 }}</h4>
+                <table class="data-table">
+                    <tr>
+                        <th>Fishing Gear Type:</th>
+                        <td>{{ $operation->gear_type ?? 'N/A' }}</td>
+                        <th>Days Fished:</th>
+                        <td>{{ $operation->days_fished ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Net/Line Length (m):</th>
+                        <td>{{ $operation->net_line_length ? number_format($operation->net_line_length, 2) : 'N/A' }}</td>
+                        <th>Soaking Time (hours):</th>
+                        <td>{{ $operation->soaking_time ? number_format($operation->soaking_time, 2) : 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Mesh Size (cm):</th>
+                        <td>{{ $operation->mesh_size ? number_format($operation->mesh_size, 2) : 'N/A' }}</td>
+                        <th>Number of Hooks:</th>
+                        <td>{{ $operation->number_of_hooks ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fishing Ground:</th>
+                        <td colspan="3">{{ $operation->fishing_ground ?? 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Coordinates (Lat, Lng):</th>
+                        <td colspan="3">
+                            @if($operation->latitude && $operation->longitude)
+                                {{ number_format($operation->latitude, 6) }}, {{ number_format($operation->longitude, 6) }}
+                            @else
+                                N/A
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Notes:</th>
+                        <td colspan="3">{{ $operation->notes ?? 'N/A' }}</td>
+                    </tr>
+                </table>
+                @if(!$loop->last)
+                    <div style="page-break-before: always;"></div>
+                @endif
+            @endforeach
+        @else
+            <p>No fishing operation details available.</p>
+        @endif
     </div>
 
     <!-- Catch Information -->
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">CATCH INFORMATION</div>
         <table class="data-table">
             <tr>
@@ -306,7 +368,7 @@
 
     <!-- AI Species Recognition & Size Estimation -->
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">SPECIES RECOGNITION & SIZE ESTIMATION</div>
         <table class="data-table">
             <tr>
@@ -367,7 +429,7 @@
     @endphp
     @if($imageData)
     <div class="section">
-        <div class="program-header">National Stock Assessment Program in Region 8</div>
+    
         <div class="section-title">FISH PHOTO</div>
         <div class="photo-section">
             <img src="{{ $imageData }}" alt="Fish Photo" style="max-width: 100%; height: auto;">

@@ -1,9 +1,125 @@
 @extends('layouts.users.app')
 
+@push('styles')
+<!-- SweetAlert2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<style>
+    /* Modern Form Styles */
+    .form-section {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .form-section .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .form-section .card-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #3a3a3a;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.15);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.25);
+    }
+
+    .btn-outline-primary {
+        border: 1px solid #4e73df;
+        color: #4e73df;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+        background: rgba(78, 115, 223, 0.1);
+    }
+
+    /* Card Styling */
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Alert Styling */
+    .alert {
+        border: none;
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #e6f7ee;
+        color: #0d6832;
+    }
+
+    .alert-danger {
+        background-color: #fdecea;
+        color: #d32f2f;
+    }
+
+    /* Form Group Styling */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Custom Radio and Checkbox */
+    .form-check-input:checked {
+        background-color: #4e73df;
+        border-color: #4e73df;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .form-section .card-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
             <!-- Success/Error Messages -->
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -34,12 +150,19 @@
                 </div>
             @endif
 
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">
-                        <i class="bx bx-clipboard me-2"></i>BFAR Fish Catch Monitoring Form
-                    </h4>
-                    <p class="card-subtitle">National Stock Assessment Program (NSAP)</p>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">
+                                <i class="bx bx-clipboard me-2"></i>BFAR Fish Catch Monitoring Form
+                            </h4>
+                            <p class="mb-0 text-white-50">National Stock Assessment Program (NSAP)</p>
+                        </div>
+                        <div class="badge bg-white text-primary px-3 py-2">
+                            <i class="bx bx-time me-1"></i> {{ now()->format('F j, Y') }}
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('catch.store') }}" method="POST" enctype="multipart/form-data" id="catchForm" novalidate>
@@ -73,9 +196,10 @@
                         </div>
 
                         <!-- General Information -->
-                        <div class="card mb-4 border-primary">
-                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bx bx-info-circle me-2"></i>✨ GENERAL INFORMATION</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <h5 class="mb-0 text-primary"><i class="bx bx-info-circle me-2"></i>✨ GENERAL INFORMATION</h5>
+                                <span class="badge bg-primary bg-opacity-10 ">Required</span>
                             </div>
                             
                             <!-- Fisherman Information -->
@@ -182,9 +306,9 @@
                         </div>
 
                         <!-- 🚢 BOAT INFORMATION -->
-                        <div class="card mb-4 border-info">
-                            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bx bx-ship me-2"></i>🚢 BOAT INFORMATION</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <h5 class="mb-0 text-info"><i class="bx bx-ship me-2"></i>🚢 BOAT INFORMATION</h5>
                                 <button type="button" id="addBoatBtn" class="btn btn-light btn-sm">
                                     <i class="bx bx-plus-circle"></i> Add Boat
                                 </button>
@@ -312,9 +436,9 @@
                         </div>
 
                         <!-- 🎯 FISHING OPERATION DETAILS -->
-                        <div class="card mb-4 border-success">
-                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bx bx-anchor me-2"></i>🎯 FISHING OPERATION DETAILS</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <h5 class="mb-0 text-success"><i class="bx bx-anchor me-2"></i>🎯 FISHING OPERATION DETAILS</h5>
                                 <button type="button" id="addFishingOpBtn" class="btn btn-light btn-sm">
                                     <i class="bx bx-plus-circle"></i> Add Operation
                                 </button>
@@ -413,11 +537,25 @@
                                                 <label class="form-label">Fishing Location (Click on the map or enter coordinates):</label>
                                                 <div class="map-container" style="height: 300px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #dee2e6;"></div>
                                                 <div class="input-group mb-3">
-                                                    <span class="input-group-text">Latitude</span>
-                                                    <input type="number" step="0.000001" class="form-control latitude" name="fishing_ops[0][latitude]" placeholder="e.g. 12.8797">
-                                                    <span class="input-group-text">Longitude</span>
-                                                    <input type="number" step="0.000001" class="form-control longitude" name="fishing_ops[0][longitude]" placeholder="e.g. 121.7740">
-                                                </div>
+                                                <span class="input-group-text">Latitude <span class="text-danger">*</span></span>
+                                                <input type="number" step="0.000001" 
+                                                    class="form-control latitude @error('fishing_ops.0.latitude') is-invalid @enderror" 
+                                                    name="fishing_ops[0][latitude]" 
+                                                    value="{{ old('fishing_ops.0.latitude', '12.8797') }}" 
+                                                    placeholder="e.g. 12.8797" required>
+                                                <span class="input-group-text">Longitude <span class="text-danger">*</span></span>
+                                                <input type="number" step="0.000001" 
+                                                    class="form-control longitude @error('fishing_ops.0.longitude') is-invalid @enderror" 
+                                                    name="fishing_ops[0][longitude]" 
+                                                    value="{{ old('fishing_ops.0.longitude', '121.7740') }}" 
+                                                    placeholder="e.g. 121.7740" required>
+                                                @error('fishing_ops.0.latitude')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                                @error('fishing_ops.0.longitude')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                                 <input type="hidden" name="fishing_ops[0][fishing_location]">
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -564,9 +702,9 @@
                                            
 
                         <!-- ⚖️ CATCH INFORMATION -->
-                        <div class="card mb-4 border-warning">
-                            <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bx bx-weight me-2"></i>⚖️ CATCH INFORMATION</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <h5 class="mb-0 text-warning"><i class="bx bx-weight me-2"></i>⚖️ CATCH INFORMATION</h5>
                                 <button type="button" id="addCatchBtn" class="btn btn-light btn-sm">
                                     <i class="bx bx-plus-circle"></i> Add Catch
                                 </button>
@@ -717,9 +855,9 @@
                         </div> <!-- End fishing operation card -->
 
                         <!-- AI Species Recognition Section -->
-                        <div class="card mb-4 border-danger">
-                            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0"><i class="bx bx-brain me-2"></i> SPECIES RECOGNITION & SIZE ESTIMATION</h5>
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                                <h5 class="mb-0 text-danger"><i class="bx bx-brain me-2"></i> SPECIES RECOGNITION & SIZE ESTIMATION</h5>
                                 <button type="button" id="addSpeciesBtn" class="btn btn-light btn-sm">
                                     <i class="bx bx-plus-circle"></i> Add Species
                                 </button>
@@ -765,10 +903,43 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="image" class="form-label">Fish Photo: <span class="text-danger" id="imageRequired">*</span></label>
                                         <div class="input-group">
-                                            <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                                            <button type="button" class="btn btn-primary" id="cameraBtn">
+                                            <input type="file" class="form-control" id="image" name="image" accept="image/*" capture="environment">
+                                            <button type="button" class="btn btn-primary" id="cameraBtn" data-bs-toggle="modal" data-bs-target="#cameraModal">
                                                 <i class="bx bx-camera me-1"></i>Take Photo
                                             </button>
+                                        </div>
+                                        <!-- Camera Preview -->
+                                        <div class="mt-2 text-center">
+                                            <img id="cameraPreview" src="" alt="Captured Photo" class="img-fluid d-none" style="max-height: 200px;">
+                                        </div>
+                                        <!-- Camera Modal -->
+                                        <div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Take a Photo</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body text-center">
+                                                        <div class="camera-container">
+                                                            <video id="video" width="100%" autoplay playsinline class="border rounded"></video>
+                                                            <canvas id="canvas" class="d-none"></canvas>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary" id="captureBtn">
+                                                            <i class="bx bx-camera me-1"></i>Capture
+                                                        </button>
+                                                        <button type="button" class="btn btn-success d-none" id="retakeBtn">
+                                                            <i class="bx bx-reset me-1"></i>Retake
+                                                        </button>
+                                                        <button type="button" class="btn btn-success d-none" id="usePhotoBtn">
+                                                            <i class="bx bx-check me-1"></i>Use Photo
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="form-text">Upload clear photos or take a photo using your camera for AI species recognition and size estimation</div>
                                     </div>
@@ -878,9 +1049,14 @@
 
                         <!-- Submit Button -->
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                                <i class="bx bx-save me-2"></i>Submit Fish Catch Report
+                            <div class="d-flex justify-content-end gap-3 pt-4 border-top">
+                            <button type="button" class="btn btn-outline-secondary">
+                                <i class="bx bx-save me-2"></i>Save Draft
                             </button>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bx bx-check-circle me-2"></i>Submit Form
+                            </button>
+                        </div>
                         </div>
                     </form>
                 </div>
@@ -1134,8 +1310,129 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
-</script>
-<script>
+
+// Camera functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const retakeBtn = document.getElementById('retakeBtn');
+    const usePhotoBtn = document.getElementById('usePhotoBtn');
+    const cameraPreview = document.getElementById('cameraPreview');
+    const fileInput = document.getElementById('image');
+    let stream = null;
+
+    // When the camera modal is shown
+    const cameraModal = document.getElementById('cameraModal');
+    if (cameraModal) {
+        cameraModal.addEventListener('shown.bs.modal', async () => {
+            try {
+                // Stop any existing stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+
+                // Get user media
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment', // Use the back camera by default
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                
+                video.srcObject = stream;
+                video.play();
+                
+                // Show capture button and hide retake/use buttons
+                captureBtn.classList.remove('d-none');
+                retakeBtn.classList.add('d-none');
+                usePhotoBtn.classList.add('d-none');
+                
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Could not access the camera. Please check your permissions and try again.');
+            }
+        });
+
+        // When the camera modal is hidden
+        cameraModal.addEventListener('hidden.bs.modal', () => {
+            // Stop all video streams
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        });
+    }
+
+    // Capture photo
+    if (captureBtn) {
+        captureBtn.addEventListener('click', () => {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the current video frame to canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Show the captured image and hide the video
+            const imageDataUrl = canvas.toDataURL('image/png');
+            cameraPreview.src = imageDataUrl;
+            cameraPreview.classList.remove('d-none');
+            
+            // Show retake and use photo buttons, hide capture button
+            captureBtn.classList.add('d-none');
+            retakeBtn.classList.remove('d-none');
+            usePhotoBtn.classList.remove('d-none');
+            
+            // Pause the video
+            video.pause();
+        });
+    }
+    
+    // Retake photo
+    if (retakeBtn) {
+        retakeBtn.addEventListener('click', () => {
+            // Hide the preview and show the video again
+            cameraPreview.classList.add('d-none');
+            video.play();
+            
+            // Show capture button and hide retake/use buttons
+            captureBtn.classList.remove('d-none');
+            retakeBtn.classList.add('d-none');
+            usePhotoBtn.classList.add('d-none');
+        });
+    }
+    
+    // Use photo
+    if (usePhotoBtn) {
+        usePhotoBtn.addEventListener('click', () => {
+            // Convert canvas to blob and create a file
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'captured-photo.png', { type: 'image/png' });
+                
+                // Create a new FileList and DataTransfer to set the file
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                // Update the file input's display (if needed)
+                if (fileInput.nextElementSibling && fileInput.nextElementSibling.classList.contains('form-control')) {
+                    fileInput.nextElementSibling.value = file.name;
+                }
+                
+                // Hide the modal
+                const modal = bootstrap.Modal.getInstance(cameraModal);
+                if (modal) {
+                    modal.hide();
+                }
+            }, 'image/png');
+        });
+    }
+});
+
 // AJAX submit that maps visible UI values to backend-expected keys
 function getVal(selector) {
   const el = document.querySelector(selector);
@@ -1405,6 +1702,30 @@ async function submitCatchFormAjax(form) {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Simple form submission with alert -->
+<script>
+$(document).ready(function() {
+    $('#catchForm').on('submit', function(e) {
+        // Show loading state
+        const submitBtn = $(this).find('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...');
+        
+        // Show success message
+        setTimeout(() => {
+            alert('Report successfully saved');
+            submitBtn.prop('disabled', false).html(originalText);
+        }, 500);
+        
+        // Let the form submit normally
+        return true;
+    });
+});
+</script>
 
 <script>
 // Wait for the DOM to be fully loaded
@@ -2178,6 +2499,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const newEntry = createNewSpeciesEntry(speciesEntries.length);
             speciesEntriesContainer.appendChild(newEntry);
             updateSpeciesNumbers();
+        });
+        
+        // Add event delegation for delete buttons (for dynamically added elements)
+        speciesContainer.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-species')) {
+                e.preventDefault();
+                const entryToRemove = e.target.closest('.species-entry');
+                if (entryToRemove && document.querySelectorAll('.species-entry').length > 1) {
+                    entryToRemove.remove();
+                    updateSpeciesNumbers();
+                } else if (document.querySelectorAll('.species-entry').length === 1) {
+                    // If it's the last entry, just clear the fields instead of removing
+                    const entry = document.querySelector('.species-entry');
+                    entry.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(input => {
+                        input.value = '';
+                    });
+                }
+            }
         });
     }
 

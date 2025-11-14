@@ -61,6 +61,23 @@
                         </div>
                     </div>
 
+                    <!-- Fisherman Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="bx bx-user me-2"></i>Fisherman Information
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Fisherman Registration ID:</label>
+                            <p class="form-control-plaintext">{{ $catch->fisherman_registration_id ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Fisherman's Full Name:</label>
+                            <p class="form-control-plaintext">{{ $catch->fisherman_name ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+
                     <!-- Boat Information -->
                     @if($catch->boats->count() > 0)
                         @foreach($catch->boats as $index => $boat)
@@ -245,26 +262,7 @@
                             <label class="form-label fw-bold">Weight (g):</label>
                             <p class="form-control-plaintext">{{ number_format($catch->weight_g, 1) }}</p>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Species Recognition Confidence:</label>
-                            <p class="form-control-plaintext">{{ $catch->confidence_score ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Fish Detection Confidence:</label>
-                            <p class="form-control-plaintext">{{ $catch->detection_confidence ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Bounding Box Width (px):</label>
-                            <p class="form-control-plaintext">{{ $catch->bbox_width ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Bounding Box Height (px):</label>
-                            <p class="form-control-plaintext">{{ $catch->bbox_height ?: 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold">Pixels per cm:</label>
-                            <p class="form-control-plaintext">{{ $catch->pixels_per_cm ? number_format($catch->pixels_per_cm, 4) : 'N/A' }}</p>
-                        </div>
+                        
                     </div>
 
                     <!-- Fish Photo -->

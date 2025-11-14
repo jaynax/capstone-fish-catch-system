@@ -56,6 +56,90 @@ class FishCatchController extends Controller
     }
 
     /**
+     * Show the form for editing the specified fish catch.
+     *
+     * @param  int  $id
+     * @return \Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $catch = FishCatch::with(['boats', 'fishingOperations'])
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+            
+        return view('catches.edit', compact('catch'));
+    }
+
+    /**
+     * Update the specified fish catch in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $catch = FishCatch::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'species' => 'required|string|max:255',
+            'weight' => 'required|numeric|min:0.01',
+            'length' => 'required|numeric|min:0.1',
+            'location' => 'required|string|max:255',
+            'date_caught' => 'required|date',
+            'fishing_method' => 'required|string|in:net,line,trap,spear,other',
+            'notes' => 'nullable|string',
+            'status' => 'required|string|in:recorded,verified,pending,rejected',
+            'image' => 'nullable|image|max:10240', // Max 10MB
+        ]);
+
+        // Handle image upload if a new image is provided
+        if ($request->hasFile('image')) {
+            // Delete old image if it exists
+            if ($catch->image_path && Storage::disk('public')->exists($catch->image_path)) {
+                Storage::disk('public')->delete($catch->image_path);
+            }
+            
+            // Store new image
+            $imagePath = $request->file('image')->store('catches', 'public');
+            $validated['image_path'] = $imagePath;
+        }
+
+        // Update the catch record
+        $catch->update($validated);
+
+        return redirect()->route('catches.show', $catch->id)
+            ->with('success', 'Catch record updated successfully!');
+    }
+
+    /**
+     * Remove the specified fish catch from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id)
+    {
+        $catch = FishCatch::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        // Delete associated image if it exists
+        if ($catch->image_path && Storage::disk('public')->exists($catch->image_path)) {
+            Storage::disk('public')->delete($catch->image_path);
+        }
+
+        // Delete the catch record
+        $catch->delete();
+
+        return redirect()->route('catches.index')
+            ->with('status', 'Catch record has been deleted successfully.');
+    }
+
+    /**
      * Store a newly created fish catch in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -101,11 +185,17 @@ class FishCatchController extends Controller
                 Storage::disk('public')->delete($imagePath);
             }
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Error processing image: ' . $e->getMessage(),
-                'error_details' => $e->getTraceAsString()
-            ], 500);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to record fish catch: ' . $e->getMessage(),
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ], 500);
+            }
+            
+            return back()->withInput()
+                ->with('error', 'Failed to record fish catch: ' . $e->getMessage());
         }
     }
 
@@ -116,6 +206,8 @@ class FishCatchController extends Controller
         \Log::info('Starting fish catch submission', ['input' => $request->except(['_token', 'image'])]);
         
         try {
+            // Set JSON response for AJAX requests
+            $isAjax = $request->ajax() || $request->wantsJson();
             // Validate the request data
             $validatedData = $request->validate([
                 // Fisherman Information
@@ -230,11 +322,34 @@ class FishCatchController extends Controller
                     if (!empty($fishingOpsData)) {
                         foreach ($fishingOpsData as $opData) {
                             // Ensure we're using the correct column name (fish_catch_id)
-                            $fishingOp = new FishingOperation($opData);
-                            $fishingOp->fish_catch_id = $fishCatch->id; // Explicitly set the fish_catch_id
+                            $fishingOp = new FishingOperation();
+                            $fishingOp->fish_catch_id = $fishCatch->id;
+                            
+                            // Map the form data to the model fields
+                            $fishingOp->fishing_gear_type = $opData['fishing_gear_type'] ?? null;
+                            $fishingOp->gear_specifications = $opData['gear_specifications'] ?? null;
+                            $fishingOp->hooks_hauls = $opData['hooks_hauls'] ?? null;
+                            $fishingOp->net_line_length = $opData['net_line_length'] ?? null;
+                            $fishingOp->soaking_time = $opData['soaking_time'] ?? null;
+                            $fishingOp->mesh_size = $opData['mesh_size'] ?? null;
+                            $fishingOp->days_fished = $opData['days_fished'] ?? 1;
+                            $fishingOp->latitude = $opData['latitude'] ?? null;
+                            $fishingOp->longitude = $opData['longitude'] ?? null;
+                            $fishingOp->fishing_location = $opData['fishing_location'] ?? 
+                                (isset($opData['latitude']) && isset($opData['longitude']) 
+                                    ? $opData['latitude'] . ',' . $opData['longitude'] 
+                                    : null);
+                            $fishingOp->payao_used = $opData['payao_used'] ?? 'No';
+                            $fishingOp->fishing_effort_notes = $opData['fishing_effort_notes'] ?? null;
+                            
                             $fishingOp->save();
-                            \Log::info('Fishing operation created', 
-                                ['id' => $fishingOp->id, 'fish_catch_id' => $fishCatch->id]);
+                            \Log::info('Fishing operation created', [
+                                'id' => $fishingOp->id, 
+                                'fish_catch_id' => $fishCatch->id,
+                                'latitude' => $fishingOp->latitude,
+                                'longitude' => $fishingOp->longitude,
+                                'gear_specifications' => $fishingOp->gear_specifications
+                            ]);
                         }
                     }
                     
@@ -244,11 +359,16 @@ class FishCatchController extends Controller
                     \Log::info('Fish catch submission completed successfully', 
                         ['id' => $fishCatch->id]);
                         
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Fish catch recorded successfully!',
-                        'redirect' => route('catches.show', $fishCatch->id)
-                    ]);
+                    if ($isAjax) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => 'Fish catch recorded successfully!',
+                            'redirect' => route('catches.show', $fishCatch->id)
+                        ]);
+                    }
+                    
+                    return redirect()->route('catches.index')
+                        ->with('success', 'Fish catch recorded successfully!');
                 } catch (\Exception $e) {
                     \Log::error('Error creating fish catch record', [
                         'error' => $e->getMessage(),
@@ -497,8 +617,29 @@ class FishCatchController extends Controller
             abort(403);
         }
 
+        // Debug: Log the catch ID and relationships
+        \Log::info('Generating PDF for catch ID: ' . $catch->id);
+        
+        // Eager load relationships
+        $catch->load(['boats', 'fishingOperations']);
+
+        // Debug: Log the loaded relationships
+        \Log::info('Loaded boats count: ' . $catch->boats->count());
+        \Log::info('Loaded fishing operations count: ' . $catch->fishingOperations->count());
+        \Log::info('Catch data: ' . json_encode($catch->toArray()));
+
+        // Get the data to pass to the view
+        $data = [
+            'catch' => $catch,
+            'boats' => $catch->boats,
+            'fishingOperations' => $catch->fishingOperations
+        ];
+
+        // Debug: Log the data being passed to the view
+        \Log::info('Data being passed to PDF view: ' . json_encode($data));
+
         // Generate PDF using the correct facade
-        $pdf = \PDF::loadView('catches.pdf', compact('catch'));
+        $pdf = \PDF::loadView('catches.pdf', $data);
         
         // Set paper size and orientation
         $pdf->setPaper('a4', 'portrait');

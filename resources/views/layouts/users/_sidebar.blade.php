@@ -90,7 +90,7 @@
 
         <!-- Edit Profile -->
         <li class="menu-item">
-            <a href="{{ route('profile.edit') }}" class="menu-link" style="background-color: #e0f7fa; border-radius: 8px; margin-top: 10px;">
+            <a href="{{ route('profile.edit') }}" class="menu-link" >
                 <i class="menu-icon bx bx-user-circle"></i>
                 <span>Edit Profile</span>
             </a>

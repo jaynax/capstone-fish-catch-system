@@ -18,12 +18,16 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     
+    // Regulations
+    Route::get('/regulations', function () {
+        return view('regulations');
+    })->name('regulations');
+    
     // Fish Catch Routes
-    Route::get('/catches', [FishCatchController::class, 'index'])->name('catches.index');
-    Route::get('/catches/create', [FishCatchController::class, 'create'])->name('catches.create');
-    Route::post('/catches', [FishCatchController::class, 'store'])->name('catches.store');
-    Route::get('/catches/{catch}', [FishCatchController::class, 'show'])->name('catches.show');
+    Route::resource('catches', FishCatchController::class)->except(['destroy']);
     Route::get('/catches/{catch}/pdf', [FishCatchController::class, 'generatePdf'])->name('catches.pdf');
+    Route::delete('/catches/{catch}', [FishCatchController::class, 'destroy'])->name('catches.destroy');
+    Route::post('/catches/{catch}/analyze', [FishCatchController::class, 'analyzeImage'])->name('catches.analyze');
 });
 
 /*
