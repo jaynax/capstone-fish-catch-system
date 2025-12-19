@@ -40,14 +40,49 @@
                 min-height: 100vh;
                 position: relative;
                 overflow-x: hidden;
+                /* Fallback background in case video doesn't load */
+                background-color: #1e3a8a;
             }
 
-            body::before {
-                content: '';
-                position: absolute;
+            /* Background Video Container */
+            .video-background {
+                position: fixed;
                 top: 0;
                 left: 0;
-                right: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                overflow: hidden;
+            }
+
+            .video-background video {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                transform: translate(-50%, -50%);
+                object-fit: cover;
+                opacity: 0.5; /* Adjust opacity as needed */
+            }
+
+            /* Overlay for better text readability */
+            .video-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: -1;
+            }
+
+            body {
+                position: relative;
+                z-index: 1;
+            }
                 bottom: 0;
                 background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="waves" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M0 50 Q25 40 50 50 T100 50 V100 H0 Z" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23waves)"/></svg>');
                 opacity: 0.3;
@@ -429,6 +464,15 @@
         </style>
     </head>
     <body>
+        <!-- Background Video -->
+        <div class="video-background">
+            <video autoplay muted loop id="bg-video">
+                <source src="{{ asset('assets/video/fish.mp4') }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="video-overlay"></div>
+        
         <div class="main-container">
             <!-- Navigation -->
             <nav class="navbar navbar-expand-lg">
@@ -489,7 +533,7 @@
                         
                         <div class="cta-buttons">
                             @auth
-                                <a href="{{ url('/personnel-dashboard') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.dashboard') }}" class="btn btn-primary">
                                     <i class="fas fa-tachometer-alt me-2"></i>
                                     Go to Dashboard
                                 </a>

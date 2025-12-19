@@ -17,7 +17,7 @@
     <ul class="menu-inner py-1" style="margin-top: 20px;">
         <!-- Dashboard -->
         <li class="menu-item">
-            <a href="{{ route('admin-dashboard') }}" class="menu-link">
+            <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon bx bx-home-circle"></i>
                 <span data-i18n="Analytics">Dashboard</span>
             </a>

@@ -37,20 +37,22 @@ class GoogleAuthController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                // Create a new user with bfar_personnel role (role_id = 1) by default
+                // Create a new user with pending status by default
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'password' => bcrypt(Str::random(24)), // Random password as it's not needed for OAuth
                     'email_verified_at' => now(), // Email is verified by Google
                     'role_id' => 1, // Default to BFAR personnel (role_id = 1)
+                    'status' => 'pending' // Set status to pending until approved by admin
                 ]);
                 
                 // Log the user in
                 Auth::login($user);
                 
-                // Redirect to appropriate dashboard based on role
-                return $this->redirectBasedOnRole($user);
+                // Redirect to pending approval page
+                return redirect()->route('pending-approval')
+                    ->with('status', 'Your account is pending approval. Please wait for an administrator to approve your account.');
             }
 
             // Update user's name if it has changed
@@ -59,7 +61,20 @@ class GoogleAuthController extends Controller
                 $user->save();
             }
 
-            // Log the existing user in
+            // Check if user is approved
+            if ($user->isPending()) {
+                Auth::login($user);
+                return redirect()->route('pending-approval')
+                    ->with('status', 'Your account is still pending approval. Please wait for an administrator to approve your account.');
+            }
+            
+            // If rejected, don't log in
+            if ($user->isRejected()) {
+                return redirect()->route('login')
+                    ->with('error', 'Your account has been rejected. Please contact the administrator.');
+            }
+            
+            // Log the user in if approved
             Auth::login($user);
             
             // Redirect based on user role
@@ -78,6 +93,12 @@ class GoogleAuthController extends Controller
      */
     protected function redirectBasedOnRole($user)
     {
+        if (!$user->isApproved()) {
+            Auth::logout();
+            return redirect()->route('login')
+                ->with('error', 'Your account is not approved yet. Please contact the administrator.');
+        }
+
         // Check user role and redirect accordingly
         switch ($user->role_id) {
             case 1: // BFAR Personnel
@@ -85,16 +106,14 @@ class GoogleAuthController extends Controller
                     ->with('success', 'Welcome back, ' . $user->name . '!');
                 
             case 2: // Admin
-                return redirect()->route('admin-dashboard')
-                    ->with('success', 'Welcome back, Administrator!');
-                
             case 3: // Regional Admin
-                return redirect()->route('admin-dashboard')
-                    ->with('success', 'Welcome back, Regional Administrator!');
+                return redirect()->route('admin.dashboard')
+                    ->with('success', $user->role_id === 2 ? 'Welcome back, Administrator!' : 'Welcome back, Regional Administrator!');
                 
             default:
-                return redirect()->intended('/')
-                    ->with('status', 'Logged in successfully!');
+                Auth::logout();
+                return redirect()->route('login')
+                    ->with('error', 'Invalid user role. Please contact the administrator.');
         }
     }
 }

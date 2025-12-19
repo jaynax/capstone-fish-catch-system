@@ -89,6 +89,7 @@ class FishCatch extends Model
     protected $casts = [
         'date_sampling' => 'date',
         'time_landing' => 'datetime',
+        'catch_datetime' => 'datetime',
         'boat_length' => 'decimal:2',
         'boat_width' => 'decimal:2',
         'boat_depth' => 'decimal:2',

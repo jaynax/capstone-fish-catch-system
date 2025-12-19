@@ -3,6 +3,8 @@
 @push('styles')
 <!-- SweetAlert2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<!-- Leaflet Control Geocoder CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 <style>
     /* Modern Form Styles */
     .form-section {
@@ -164,12 +166,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <form action="{{ route('catch.store') }}" method="POST" enctype="multipart/form-data" id="catchForm" novalidate>
-                        @csrf
+        <div class="card-body">
+            <form action="{{ route('catch.store') }}" method="POST" enctype="multipart/form-data" id="catchForm" novalidate>
+                @csrf
                         
-                        <!-- Region Selection -->
-                        <div class="row mb-4">
+                <!-- Region Selection -->
+                <div class="row mb-4">
                             <div class="col-md-6">
                                 <label for="region" class="form-label fw-bold">Region: <span class="text-danger">*</span></label>
                                 <select class="form-select" id="region" name="region" required>
@@ -289,6 +291,7 @@
                                         <label for="fishing_ground" class="form-label">Fishing Ground: <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="fishing_ground" name="fishing_ground" required>
                                     </div>
+                                    
                                     <div class="col-md-6 mb-3">
                                         <label for="weather_conditions" class="form-label">Weather Conditions: <span class="text-danger">*</span></label>
                                         <select class="form-select" id="weather_conditions" name="weather_conditions" required>
@@ -305,14 +308,14 @@
                             </div>
                         </div>
 
-                        <!-- 🚢 BOAT INFORMATION -->
-                        <div class="card mb-4 border-0 shadow-sm">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
-                                <h5 class="mb-0 text-info"><i class="bx bx-ship me-2"></i>🚢 BOAT INFORMATION</h5>
-                                <button type="button" id="addBoatBtn" class="btn btn-light btn-sm">
-                                    <i class="bx bx-plus-circle"></i> Add Boat
-                                </button>
-                            </div>
+                <!-- 🚢 BOAT INFORMATION -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                        <h5 class="mb-0 text-info"><i class="bx bx-ship me-2"></i>🚢 BOAT INFORMATION</h5>
+                        <button type="button" id="addBoatBtn" class="btn btn-light btn-sm">
+                            <i class="bx bx-plus-circle"></i> Add Boat
+                        </button>
+                    </div>
                             <div class="card-body" id="boatInfoContainer">
                                 <!-- Boat Info Entry Template (Hidden) -->
                                 <div class="boat-entry card mb-3 border-secondary" style="display: none;">
@@ -322,9 +325,7 @@
                                             <i class="bx bx-trash"></i>
                                         </button>
                                     </div>
-                                    <div class="card-body">
-                                        <!-- Map Container -->
-                                        
+                                    
                                         
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
@@ -335,11 +336,11 @@
                                                 <label class="form-label">Boat Type: <span class="text-danger">*</span></label>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="boats[0][boat_type]" value="Motorized" disabled>
-                                                    <label class="form-check-label">☑ Motorized</label>
+                                                    <label class="form-check-label">Motorized</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="boats[0][boat_type]" value="Non-motorized" disabled>
-                                                    <label class="form-check-label">☑ Non-motorized</label>
+                                                    <label class="form-check-label">Non-motorized</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-3 mb-3">
@@ -390,11 +391,11 @@
                                     <label class="form-label">Boat Type: <span class="text-danger">*</span></label>
                                     <div class="form-check">
                                     <input class="form-check-input" type="radio" name="boats[0][boat_type]" id="motorized_0" value="Motorized" required>
-                                    <label class="form-check-label" for="motorized_0">☑ Motorized</label>
+                                    <label class="form-check-label" for="motorized_0">Motorized</label>
                                     </div>
                                     <div class="form-check">
                                     <input class="form-check-input" type="radio" name="boats[0][boat_type]" id="non_motorized_0" value="Non-motorized" required>
-                                    <label class="form-check-label" for="non_motorized_0">☑ Non-motorized</label>
+                                    <label class="form-check-label" for="non_motorized_0">Non-motorized</label>
                                     </div>
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -435,13 +436,11 @@
                             <!-- End of First Boat Entry -->
                         </div>
 
-                        <!-- 🎯 FISHING OPERATION DETAILS -->
-                        <div class="card mb-4 border-0 shadow-sm">
+                <!-- 🎯 FISHING OPERATION DETAILS -->
+                <div class="card mb-4 border-0 shadow-sm">
                             <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
                                 <h5 class="mb-0 text-success"><i class="bx bx-anchor me-2"></i>🎯 FISHING OPERATION DETAILS</h5>
-                                <button type="button" id="addFishingOpBtn" class="btn btn-light btn-sm">
-                                    <i class="bx bx-plus-circle"></i> Add Operation
-                                </button>
+                                
                             </div>
                             <div class="card-body">
                                 <div id="fishingOpContainer">
@@ -668,27 +667,63 @@
                                                 <label class="form-label">Number of Days Fished: <span class="text-danger">*</span></label>
                                                 <input type="number" class="form-control" name="fishing_ops[0][days_fished]" required>
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                        <label for="fishing_location" class="form-label">Fishing Location (Click on the map or enter coordinates):</label>
-                                        <div id="map" style="height: 300px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #dee2e6;"></div>
-                                        <div class="input-group mb-3">
-                                            <span class="input-group-text"><i class="bx bx-navigation"></i> Latitude</span>
-                                            <input type="number" step="0.000001" class="form-control" id="latitude" name="latitude" placeholder="e.g. 12.8797">
-                                            <span class="input-group-text"><i class="bx bx-navigation"></i> Longitude</span>
-                                            <input type="number" step="0.000001" class="form-control" id="longitude" name="longitude" placeholder="e.g. 121.7740">
-                                        </div>
-                                       
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label">Fishing Location: <span class="text-danger">*</span></label>
+                                                <div class="position-relative mb-3" style="height: 400px; border: 1px solid #dee2e6; border-radius: 5px; overflow: hidden;">
+                                                    <!-- Search Box -->
+                                                    <div class="position-absolute top-0 start-0 w-100 p-2" style="z-index: 1000;">
+                                                        <div class="input-group shadow-sm" style="max-width: 500px; margin: 0 auto;">
+                                                            <input type="text" class="form-control border-end-0" placeholder="Search location..." id="fishing-location-search">
+                                                            <button class="btn btn-primary" type="button" id="search-location-btn">
+                                                                <i class="bx bx-search"></i> Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Map Container -->
+                                                    <div id="fishing-location-map" style="height: 100%; width: 100%;"></div>
+                                                </div>
+                                                <div class="text-muted small mb-2">Click on the map or search to set the location</div>
+                                                
+                                                <!-- Coordinates Inputs -->
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <div class="input-group">
+                                                            <span class="input-group-text">Latitude <span class="text-danger">*</span></span>
+                                                            <input type="number" step="0.000001" 
+                                                                class="form-control latitude @error('fishing_ops.0.latitude') is-invalid @enderror" 
+                                                                name="fishing_ops[0][latitude]" 
+                                                                id="latitude"
+                                                                value="{{ old('fishing_ops.0.latitude', '12.8797') }}" 
+                                                                placeholder="e.g. 12.8797" required>
+                                                            <span class="input-group-text">Longitude <span class="text-danger">*</span></span>
+                                                            <input type="number" step="0.000001" 
+                                                                class="form-control longitude @error('fishing_ops.0.longitude') is-invalid @enderror" 
+                                                                name="fishing_ops[0][longitude]"
+                                                                id="longitude"
+                                                                value="{{ old('fishing_ops.0.longitude', '121.7740') }}" 
+                                                                placeholder="e.g. 121.7740" required>
+                                                            @error('fishing_ops.0.latitude')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                            @error('fishing_ops.0.longitude')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input type="hidden" name="fishing_ops[0][fishing_location]" id="fishing_location">
+                                            </div>                                       
                                         <input type="hidden" id="fishing_location" name="fishing_location">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Payao Used?</label>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="payao_used" id="payao_yes" value="Yes">
-                                            <label class="form-check-label" for="payao_yes">☑ Yes</label>
+                                            <label class="form-check-label" for="payao_yes">Yes</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="payao_used" id="payao_no" value="No">
-                                            <label class="form-check-label" for="payao_no">☑ No</label>
+                                            <label class="form-check-label" for="payao_no">No</label>
                                         </div>
                                     </div>
                                     <div class="col-md-6 mb-3">
@@ -698,17 +733,16 @@
                                 </div>
                             </div>
                         </div>
-
                                            
 
-                        <!-- ⚖️ CATCH INFORMATION -->
-                        <div class="card mb-4 border-0 shadow-sm">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
-                                <h5 class="mb-0 text-warning"><i class="bx bx-weight me-2"></i>⚖️ CATCH INFORMATION</h5>
-                                <button type="button" id="addCatchBtn" class="btn btn-light btn-sm">
-                                    <i class="bx bx-plus-circle"></i> Add Catch
-                                </button>
-                            </div>
+                <!-- ⚖️ CATCH INFORMATION -->
+                <div class="card mb-4 border-0 shadow-sm">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center border-bottom">
+                        <h5 class="mb-0 text-warning"><i class="bx bx-weight me-2"></i>⚖️ CATCH INFORMATION</h5>
+                        <button type="button" id="addCatchBtn" class="btn btn-light btn-sm">
+                            <i class="bx bx-plus-circle"></i> Add Catch
+                        </button>
+                    </div>
                             <div class="card-body" id="catchInfoContainer">
                                 <!-- Catch Information Entry Template (Hidden) -->
                                 <div class="catch-entry card mb-3 border-secondary" style="display: none;">
@@ -727,15 +761,15 @@
                                                 @enderror
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Complete" {{ old('catch_type') == 'Complete' ? 'checked' : '' }} required>
-                                                    <label class="form-check-label">☑ Complete</label>
+                                                    <label class="form-check-label">Complete</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Incomplete" {{ old('catch_type') == 'Incomplete' ? 'checked' : '' }} required>
-                                                    <label class="form-check-label">☑ Incomplete</label>
+                                                    <label class="form-check-label">Incomplete</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Partly Sold" {{ old('catch_type') == 'Partly Sold' ? 'checked' : '' }} required>
-                                                    <label class="form-check-label">☑ Partly Sold</label>
+                                                    <label class="form-check-label">Partly Sold</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -749,11 +783,11 @@
                                                 <label class="form-label">Sub-sample Taken?</label>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="subsample_taken" value="Yes">
-                                                    <label class="form-check-label">☑ Yes</label>
+                                                    <label class="form-check-label">Yes</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="subsample_taken" value="No">
-                                                    <label class="form-check-label">☑ No</label>
+                                                    <label class="form-check-label">No</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -764,11 +798,11 @@
                                                 <label class="form-label">Were any fish below legal size?</label>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="below_legal_size" value="Yes">
-                                                    <label class="form-check-label">☑ Yes</label>
+                                                    <label class="form-check-label">Yes</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="below_legal_size" value="No">
-                                                    <label class="form-check-label">☑ No</label>
+                                                    <label class="form-check-label">No</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 mb-3">
@@ -793,15 +827,15 @@
                                                 <label class="form-label">Catch Type: <span class="text-danger">*</span></label>
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Complete" {{ old('catch_type') == 'Complete' ? 'checked' : '' }} required>
-                                                    <label class="form-check-label">☑ Complete</label>
+                                                    <label class="form-check-label">Complete</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Incomplete" {{ old('catch_type') == 'Incomplete' ? 'checked' : '' }}>
-                                                    <label class="form-check-label">☑ Incomplete</label>
+                                                    <label class="form-check-label">Incomplete</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input @error('catch_type') is-invalid @enderror" type="radio" name="catch_type" value="Partly Sold" {{ old('catch_type') == 'Partly Sold' ? 'checked' : '' }}>
-                                                    <label class="form-check-label">☑ Partly Sold</label>
+                                                    <label class="form-check-label">Partly Sold</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-4 mb-3">
@@ -816,11 +850,11 @@
                                                 <label class="form-label">Sub-sample Taken?</label>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="subsample_taken" value="Yes">
-                                                    <label class="form-check-label">☑ Yes</label>
+                                                    <label class="form-check-label">Yes</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="subsample_taken" value="No">
-                                                    <label class="form-check-label">☑ No</label>
+                                                    <label class="form-check-label">No</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-3">
@@ -831,11 +865,11 @@
                                                 <label class="form-label">Were any fish below legal size?</label>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="below_legal_size" value="Yes">
-                                                    <label class="form-check-label">☑ Yes</label>
+                                                    <label class="form-check-label">Yes</label>
                                                 </div>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="radio" name="below_legal_size" value="No">
-                                                    <label class="form-check-label">☑ No</label>
+                                                    <label class="form-check-label">No</label>
                                                 </div>
                                             </div>
                                             <div class="col-md-12 mb-3">
@@ -903,108 +937,90 @@
                                     <div class="col-md-6 mb-3">
                                         <label for="image" class="form-label">Fish Photo: <span class="text-danger" id="imageRequired">*</span></label>
                                         <div class="input-group">
-                                            <input type="file" class="form-control" id="image" name="image" accept="image/*" capture="environment">
-                                            <button type="button" class="btn btn-primary" id="cameraBtn" data-bs-toggle="modal" data-bs-target="#cameraModal">
-                                                <i class="bx bx-camera me-1"></i>Take Photo
+                                            <input type="file" class="form-control" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/gif">
+                                            <button type="button" class="btn btn-primary" id="cameraBtn">
+                                                <i class="bx bx-camera me-1"></i>Open Camera
                                             </button>
                                         </div>
-                                        <!-- Camera Preview -->
-                                        <div class="mt-2 text-center">
-                                            <img id="cameraPreview" src="" alt="Captured Photo" class="img-fluid d-none" style="max-height: 200px;">
+                                        <div class="form-text">Upload clear photos or take a photo using your camera for AI species recognition and size estimation</div>
+                                        
+                                        <!-- Preview Wrapper -->
+                                        <div id="imagePreview" class="mt-3" style="display: none;">
+                                            <div id="previewWrapper" class="text-center" style="min-height: 200px; display: flex; justify-content: center; align-items: center; border: 2px dashed #dee2e6; border-radius: 0.5rem; padding: 1rem;">
+                                                <img id="preview" src="#" alt="Preview" class="img-fluid" style="max-height: 300px; max-width: 100%; object-fit: contain; display: none;">
+                                            </div>
+                                            <div class="mt-2 text-center">
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="clearImage()">
+                                                    <i class="bx bx-trash me-1"></i> Remove Image
+                                                </button>
+                                            </div>
                                         </div>
-                                        <!-- Camera Modal -->
-                                        <div class="modal fade" id="cameraModal" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Take a Photo</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body text-center">
-                                                        <div class="camera-container">
-                                                            <video id="video" width="100%" autoplay playsinline class="border rounded"></video>
-                                                            <canvas id="canvas" class="d-none"></canvas>
+                                    </div>
+                                    
+                                    <!-- Camera Preview Section -->
+                                    <div class="col-md-6 mb-3">
+                                        <div id="cameraContainer" class="d-none">
+                                            <div class="card">
+                                                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                                    <span>Camera Preview</span>
+                                                    <button type="button" class="btn-close" id="closeCameraBtn" aria-label="Close"></button>
+                                                </div>
+                                                <div class="card-body p-0">
+                                                    <div class="position-relative" style="height: 300px; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                                                        <video id="video" autoplay playsinline style="max-height: 100%; max-width: 100%; object-fit: contain;"></video>
+                                                        <canvas id="canvas" class="d-none"></canvas>
+                                                        <div id="cameraPreview" class="position-absolute w-100 h-100 d-none" style="top: 0; left: 0;">
+                                                            <img id="cameraImage" alt="Captured photo" class="h-100 w-100" style="object-fit: contain;">
                                                         </div>
                                                     </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="button" class="btn btn-primary" id="captureBtn">
-                                                            <i class="bx bx-camera me-1"></i>Capture
-                                                        </button>
-                                                        <button type="button" class="btn btn-success d-none" id="retakeBtn">
-                                                            <i class="bx bx-reset me-1"></i>Retake
-                                                        </button>
-                                                        <button type="button" class="btn btn-success d-none" id="usePhotoBtn">
-                                                            <i class="bx bx-check me-1"></i>Use Photo
-                                                        </button>
+                                                    <div class="card-footer bg-white">
+                                                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                                                            <button type="button" class="btn btn-primary" id="captureBtn">
+                                                                <i class="bx bx-camera me-1"></i>Capture
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-secondary" id="switchCameraBtn">
+                                                                <i class="bx bx-refresh me-1"></i>Switch Camera
+                                                            </button>
+                                                            <button type="button" class="btn btn-outline-danger d-none" id="retakeBtn">
+                                                                <i class="bx bx-reset me-1"></i>Retake
+                                                            </button>
+                                                            <button type="button" class="btn btn-success d-none" id="usePhotoBtn">
+                                                                <i class="bx bx-check me-1"></i>Use Photo
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-text">Upload clear photos or take a photo using your camera for AI species recognition and size estimation</div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div id="imagePreview" class="mt-2" style="display: none;">
-                                            <img id="preview" src="" alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
-                                            <div id="detectionOverlay" class="mt-2" style="display: none;">
-                                                <small class="text-info"><i class="bx bx-target me-1"></i>Fish detected and cropped</small>
+                                        
+                                        <!-- Processing Status -->
+                                        <div id="processingStatus" class="alert alert-warning mt-3" style="display: none;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="spinner-border spinner-border-sm me-2" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <span id="statusText">Processing image with AI models...</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Camera Modal -->
-                                <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="cameraModalLabel">
-                                                    <i class="bx bx-camera me-2"></i>Take Fish Photo
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-12 text-center mb-3">
-                                                        <video id="cameraVideo" autoplay playsinline style="width: 100%; max-width: 640px; border-radius: 8px;"></video>
-                                                    </div>
-                                                    <div class="col-12 text-center">
-                                                        <canvas id="cameraCanvas" style="display: none;"></canvas>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                                    <i class="bx bx-x me-1"></i>Cancel
-                                                </button>
-                                                <button type="button" class="btn btn-primary" id="captureBtn">
-                                                    <i class="bx bx-camera me-1"></i>Capture Photo
-                                                </button>
-                                                <button type="button" class="btn btn-success" id="usePhotoBtn" style="display: none;">
-                                                    <i class="bx bx-check me-1"></i>Use This Photo
-                                                </button>
-                                                <button type="button" class="btn btn-warning" id="retakeBtn" style="display: none;">
-                                                    <i class="bx bx-refresh me-1"></i>Retake
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                                 
                                 <!-- AI Prediction Results -->
                                 <div class="row mt-3">
-                                    <div class="col-md-3 mb-3">
-                                        <label for="species" class="form-label">Species (CNN + MobileNetV2): <span class="text-danger">*</span></label>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="species" class="form-label">Species: <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="species" name="species" required>
-                                        <div class="form-text">Auto-detected by CNN + MobileNetV2</div>
+                                        <div class="form-text">Auto-detected from image</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="scientific_name" class="form-label">Scientific Name:</label>
-                                        <input type="text" class="form-control" id="scientific_name" name="scientific_name">
-                                        <div class="form-text">Auto-filled from species database</div>
+                                        <label for="scientific_name" class="form-label">Scientific Name: <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="scientific_name" name="scientific_name" required>
+                                        <div class="form-text">Auto-detected from image</div>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="length_cm" class="form-label">Length (cm) - YOLOv8 + OpenCV: <span class="text-danger">*</span></label>
+                                        <label for="length_cm" class="form-label">Length (cm) <span class="text-danger">*</span></label>
                                         <input type="number" step="0.1" class="form-control" id="length_cm" name="length_cm" required>
                                         <div class="form-text">Auto-estimated using YOLOv8 detection + OpenCV measurement</div>
                                     </div>
@@ -1064,6 +1080,34 @@
         </div>
     </div>
 </div>
+<!-- Load Leaflet CSS from CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" 
+    crossorigin="anonymous"
+    onerror="console.error('Failed to load Leaflet CSS')">
+
+<!-- Load Leaflet JS from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" 
+    crossorigin="anonymous"
+    onerror="console.error('Failed to load Leaflet JS')"></script>
+
+<!-- Load Leaflet Control Geocoder CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" 
+    onerror="console.error('Failed to load Geocoder CSS'); this.remove();" />
+
+<!-- Load Leaflet Control Geocoder JS -->
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"
+    onerror="console.error('Failed to load Geocoder JS'); this.remove();"></script>
+
+<!-- Include the fish identification script -->
+<script src="{{ asset('js/fish-identification.js') }}" onerror="console.error('Failed to load fish identification script')"></script>
+
+<!-- Initialize global L object -->
+<script>
+// Ensure L is available globally for Leaflet
+window.L = window.L || {};
+console.log('Leaflet version:', L.version);
+</script>
+
 <script>
 // Ensure hidden templates do not have required fields that trigger native validation
 (function () {
@@ -1182,8 +1226,13 @@ function validateForm(formElement) {
 
 // Add event listener for form submission
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('catchForm');
-    if (form) {
+    try {
+        const form = document.getElementById('catchForm');
+        if (!form) {
+            console.error('Form element not found');
+            return;
+        }
+        
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -1313,124 +1362,532 @@ document.head.appendChild(style);
 
 // Camera functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const captureBtn = document.getElementById('captureBtn');
-    const retakeBtn = document.getElementById('retakeBtn');
+    const switchCameraBtn = document.getElementById('switchCameraBtn');
     const usePhotoBtn = document.getElementById('usePhotoBtn');
     const cameraPreview = document.getElementById('cameraPreview');
     const fileInput = document.getElementById('image');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const cameraContainer = document.getElementById('cameraContainer');
+    
+    // Camera state
+    let currentFacingMode = 'environment'; // Start with back camera
     let stream = null;
+    
+    // Check if all required elements exist
+    if (!video || !canvas || !cameraBtn) {
+        console.error('Required camera elements are missing');
+        return;
+    }
+    
+    // Debug: Log all elements
+    console.log('Camera Elements:', {
+        video, canvas, captureBtn, retakeBtn, usePhotoBtn,
+        cameraPreview, fileInput, cameraModal, cameraBtn
+    });
+    
+    // Check for required elements
+    if (!video || !canvas || !cameraModal) {
+        const missing = [];
+        if (!video) missing.push('video');
+        if (!canvas) missing.push('canvas');
+        if (!cameraModal) missing.push('cameraModal');
+        console.error('Missing required elements:', missing.join(', '));
+        return;
+    }
+    
+    // State
+    let stream = null;
+    let isCaptured = false;
 
-    // When the camera modal is shown
-    const cameraModal = document.getElementById('cameraModal');
-    if (cameraModal) {
-        cameraModal.addEventListener('shown.bs.modal', async () => {
-            try {
-                // Stop any existing stream
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-
-                // Get user media
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment', // Use the back camera by default
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    },
-                    audio: false
-                });
-                
-                video.srcObject = stream;
-                video.play();
-                
-                // Show capture button and hide retake/use buttons
-                captureBtn.classList.remove('d-none');
-                retakeBtn.classList.add('d-none');
-                usePhotoBtn.classList.add('d-none');
-                
-            } catch (err) {
-                console.error('Error accessing camera:', err);
-                alert('Could not access the camera. Please check your permissions and try again.');
-            }
-        });
-
-        // When the camera modal is hidden
-        cameraModal.addEventListener('hidden.bs.modal', () => {
-            // Stop all video streams
+    // Toggle camera visibility
+    // Function to properly stop the camera
+    function stopCamera() {
+        console.log('Stopping camera...');
+        if (stream) {
+            // Stop all tracks in the stream
+            stream.getTracks().forEach(track => {
+                track.stop();
+                console.log('Stopped track:', track.kind);
+            });
+            stream = null;
+        }
+        
+        // Reset video element
+        if (video) {
+            video.pause();
+            video.srcObject = null;
+            video.style.display = 'block';
+        }
+        
+        // Reset canvas
+        if (canvas) {
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Reset preview
+        const cameraPreview = document.getElementById('cameraPreview');
+        const capturedPreviewContainer = document.getElementById('capturedPreviewContainer');
+        if (cameraPreview) cameraPreview.src = '#';
+        if (capturedPreviewContainer) capturedPreviewContainer.style.display = 'none';
+        
+        // Reset UI
+        if (usePhotoBtn) usePhotoBtn.classList.add('d-none');
+        if (captureBtn) captureBtn.classList.remove('d-none');
+    }
+    
+    // Toggle camera visibility
+    function toggleCamera(show) {
+        if (show) {
+            cameraContainer.classList.remove('d-none');
+            startCamera().catch(error => {
+                console.error('Error starting camera:', error);
+                showError('Failed to access camera. Please make sure camera permissions are granted.');
+                cameraContainer.classList.add('d-none');
+            });
+        } else {
+            stopCamera();
+        }
+    }
+    
+    // Show error message
+    function showError(message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger mt-3';
+        alertDiv.innerHTML = `
+            <i class="bx bx-error me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        const container = cameraContainer.parentElement;
+        container.insertBefore(alertDiv, cameraContainer);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
+    
+    // Start camera function with detailed error handling
+    async function startCamera() {
+        console.log('Starting camera...');
+        try {
+            // Stop any existing stream
             if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
+                console.log('Stopping existing stream');
+                stopCamera();
             }
-        });
+            
+            // Log available devices
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            console.log('Available devices:', devices);
+            
+            // Try to get user media with different constraints
+            const constraints = {
+                video: {
+                    facingMode: 'environment', // Try back camera first
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                },
+                audio: false
+            };
+            
+            console.log('Requesting camera with constraints:', constraints);
+            
+            // Request camera access
+            stream = await navigator.mediaDevices.getUserMedia(constraints);
+            console.log('Got media stream:', stream);
+            
+            // Set video source
+            video.srcObject = stream;
+            
+            // Wait for video to be ready
+            await new Promise((resolve, reject) => {
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resolve();
+                };
+                video.onerror = (error) => {
+                    console.error('Error loading video:', error);
+                    reject(new Error('Failed to load video stream'));
+                };
+            });
+                video.onloadedmetadata = () => {
+                    console.log('Video metadata loaded, playing...');
+                    video.play()
+                        .then(() => {
+                            console.log('Video is playing');
+                            resolve();
+                        })
+                        .catch(reject);
+                };
+                video.onerror = reject;
+                
+                // Set timeout in case onloadedmetadata doesn't fire
+                setTimeout(() => {
+                    if (video.readyState >= 2) { // HAVE_CURRENT_DATA
+                        video.play().then(resolve).catch(reject);
+                    }
+                }, 1000);
+            });
+            
+            // Show video and hide canvas
+            video.classList.remove('d-none');
+            canvas.classList.add('d-none');
+            
+            // Update UI state
+            if (captureBtn) captureBtn.classList.remove('d-none');
+            if (usePhotoBtn) usePhotoBtn.classList.add('d-none');
+            
+            isCaptured = false;
+            
+        } catch (err) {
+            console.error('Camera error:', err);
+            
+            let errorMessage = 'Camera error: ';
+            if (err.name === 'NotAllowedError') {
+                errorMessage = 'Please allow camera access in your browser settings.';
+            } else if (err.name === 'NotFoundError') {
+                errorMessage = 'No camera found on this device.';
+            } else if (err.name === 'NotReadableError') {
+                errorMessage = 'Camera is already in use by another application.';
+            } else {
+                errorMessage += err.message || 'Unknown error';
+            }
+            
+            showError(errorMessage);
+            
+            // Try fallback to user-facing camera
+            if (err.name === 'OverconstrainedError' || err.name === 'NotFoundError') {
+                console.log('Trying fallback to user-facing camera...');
+                try {
+                    const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' },
+                        audio: false
+                    });
+                    stream = fallbackStream;
+                    video.srcObject = stream;
+                    await video.play();
+                    video.classList.remove('d-none');
+                    return true; // Success
+                } catch (fallbackErr) {
+                    console.error('Fallback camera failed:', fallbackErr);
+                    // Close modal if we can't access camera
+                    const modal = bootstrap && bootstrap.Modal ? bootstrap.Modal.getInstance(cameraModal) : null;
+                    if (modal) {
+                        modal.hide();
+                    }
+                    return false; // Indicate failure
+                }
+        }
     }
 
-    // Capture photo
-    if (captureBtn) {
-        captureBtn.addEventListener('click', () => {
+    // Stop camera function
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => {
+                track.stop();
+            });
+            stream = null;
+        }
+        
+        if (video.srcObject) {
+            video.srcObject = null;
+        }
+    }
+
+    // Capture photo function
+    function capturePhoto() {
+        try {
+            if (!stream || !video.videoWidth) {
+                throw new Error('Camera not ready');
+            }
+            
             // Set canvas dimensions to match video
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Draw the current video frame to canvas
+            // Draw current video frame to canvas
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
             // Show the captured image and hide the video
-            const imageDataUrl = canvas.toDataURL('image/png');
-            cameraPreview.src = imageDataUrl;
-            cameraPreview.classList.remove('d-none');
+            video.style.display = 'none';
             
-            // Show retake and use photo buttons, hide capture button
+            // Show the use photo button and hide capture button
             captureBtn.classList.add('d-none');
-            retakeBtn.classList.remove('d-none');
             usePhotoBtn.classList.remove('d-none');
             
-            // Pause the video
-            video.pause();
-        });
-    }
-    
-    // Retake photo
-    if (retakeBtn) {
-        retakeBtn.addEventListener('click', () => {
-            // Hide the preview and show the video again
-            cameraPreview.classList.add('d-none');
-            video.play();
+            // Set the preview image source and show it
+            const imageDataUrl = canvas.toDataURL('image/jpeg');
+            const cameraPreview = document.getElementById('cameraPreview');
+            const capturedPreviewContainer = document.getElementById('capturedPreviewContainer');
             
-            // Show capture button and hide retake/use buttons
-            captureBtn.classList.remove('d-none');
-            retakeBtn.classList.add('d-none');
-            usePhotoBtn.classList.add('d-none');
-        });
+            cameraPreview.src = imageDataUrl;
+            capturedPreviewContainer.style.display = 'block';
+            
+            console.log('Photo captured successfully');
+            
+        } catch (error) {
+            console.error('Error capturing photo:', error);
+            showError('Failed to capture photo. Please try again.');
+        }
+    }
+
+    // Show error message to user
+    function showError(message) {
+        console.error('Camera Error:', message);
+        // You can show this in a more user-friendly way in your UI
+        alert('Camera Error: ' + message);
     }
     
-    // Use photo
-    if (usePhotoBtn) {
-        usePhotoBtn.addEventListener('click', () => {
-            // Convert canvas to blob and create a file
-            canvas.toBlob((blob) => {
-                const file = new File([blob], 'captured-photo.png', { type: 'image/png' });
+    // Initialize event listeners
+    function initializeCamera() {
+        // Toggle camera when camera button is clicked
+        if (cameraBtn) {
+            let isCameraOpen = false;
+            
+            cameraBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                isCameraOpen = !isCameraOpen;
+                toggleCamera(isCameraOpen);
                 
-                // Create a new FileList and DataTransfer to set the file
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                fileInput.files = dataTransfer.files;
+                // Update button text
+                cameraBtn.innerHTML = isCameraOpen ? 
+                    '<i class="bx bx-x me-1"></i>Close Camera' : 
+                    '<i class="bx bx-camera me-1"></i>Open Camera';
                 
-                // Update the file input's display (if needed)
-                if (fileInput.nextElementSibling && fileInput.nextElementSibling.classList.contains('form-control')) {
-                    fileInput.nextElementSibling.value = file.name;
-                }
-                
-                // Hide the modal
-                const modal = bootstrap.Modal.getInstance(cameraModal);
-                if (modal) {
-                    modal.hide();
-                }
-            }, 'image/png');
+                // Toggle button class
+                cameraBtn.classList.toggle('btn-danger', isCameraOpen);
+                cameraBtn.classList.toggle('btn-primary', !isCameraOpen);
+            });
+        }
+        
+        // Capture button
+        if (captureBtn) {
+            captureBtn.addEventListener('click', capturePhoto);
+        }
+        
+        // Switch camera button
+        if (switchCameraBtn) {
+            switchCameraBtn.addEventListener('click', () => {
+                // Toggle between front and back camera
+                currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+                startCamera();
+            });
+        }
+        
+        // Use photo button
+        if (usePhotoBtn) {
+            usePhotoBtn.addEventListener('click', usePhoto);
+        }
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Page is hidden, stop camera to save resources
+                stopCamera();
+            } else if (cameraContainer && !cameraContainer.classList.contains('d-none')) {
+                // Page is visible and camera was open, restart camera
+                startCamera();
+            }
+        });
+        
+        console.log('Camera initialized');
+    }
+    
+    // Initialize camera when all required libraries are loaded
+    function checkDependencies() {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            initializeCamera();
+        } else {
+            console.log('Waiting for Bootstrap to load...');
+            setTimeout(checkDependencies, 100);
+        }
+    }
+    
+    // Start the initialization process
+    checkDependencies();
+    }
+    
+    // Camera button click
+    if (cameraBtn) {
+        cameraBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            const modal = new bootstrap.Modal(cameraModal);
+            modal.show();
         });
     }
+});
+        // Show the captured image and hide the video
+        video.classList.add('d-none');
+        canvas.classList.remove('d-none');
+        
+        // Toggle buttons
+        captureBtn.classList.add('d-none');
+        retakeBtn.classList.remove('d-none');
+        usePhotoBtn.classList.remove('d-none');
+    }
+
+    // Function to retake photo
+    function retakePhoto() {
+        video.classList.remove('d-none');
+        canvas.classList.add('d-none');
+        captureBtn.classList.remove('d-none');
+        retakeBtn.classList.add('d-none');
+        usePhotoBtn.classList.add('d-none');
+    }
+
+    // Function to use the captured photo
+    function usePhoto() {
+        // Convert canvas to blob
+        canvas.toBlob(function(blob) {
+            // Create a file from the blob
+            const file = new File([blob], 'captured-photo.jpg', { type: 'image/jpeg' });
+            
+            // Create a data URL for preview
+            const imageUrl = URL.createObjectURL(blob);
+            
+            // Update the file input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            
+            // Show preview
+            cameraPreview.src = imageUrl;
+            cameraPreview.classList.remove('d-none');
+            
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cameraModal'));
+            if (modal) modal.hide();
+            
+            // Enable the process button if it exists
+            const processBtn = document.getElementById('processImageBtn');
+            if (processBtn) processBtn.disabled = false;
+            
+        }, 'image/jpeg', 0.9);
+    }
+
+    // Event Listeners
+    if (document.getElementById('cameraModal')) {
+        const cameraModal = document.getElementById('cameraModal');
+        
+        // When modal is shown
+        cameraModal.addEventListener('shown.bs.modal', function() {
+            startCamera();
+        });
+        
+        // When modal is hidden
+        cameraModal.addEventListener('hidden.bs.modal', function() {
+            stopCamera();
+            retakePhoto(); // Reset camera state
+        });
+        
+        // Capture button
+        if (captureBtn) {
+            captureBtn.addEventListener('click', capturePhoto);
+        }
+        
+        // Retake button
+        if (retakeBtn) {
+            retakeBtn.addEventListener('click', retakePhoto);
+        }
+        
+        // Use Photo button
+        if (usePhotoBtn) {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const captureBtn = document.getElementById("captureBtn");
+    const retakeBtn = document.getElementById("retakeBtn");
+    const usePhotoBtn = document.getElementById("usePhotoBtn");
+    const cameraPreview = document.getElementById("cameraPreview");
+    const fileInput = document.getElementById("image");
+    const cameraModal = document.getElementById("cameraModal");
+
+    let stream = null;
+
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { ideal: "environment" }, 
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                },
+                audio: false
+            });
+
+            video.srcObject = stream;
+            video.play();
+        } catch (err) {
+            alert("Camera error: " + err.message);
+            const modal = bootstrap.Modal.getInstance(cameraModal);
+            if (modal) modal.hide();
+        }
+    }
+
+    function stopCamera() {
+        if (!stream) return;
+        stream.getTracks().forEach(track => track.stop());
+    }
+
+    captureBtn.addEventListener("click", () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+
+        video.classList.add("d-none");
+        canvas.classList.remove("d-none");
+
+        captureBtn.classList.add("d-none");
+        retakeBtn.classList.remove("d-none");
+        usePhotoBtn.classList.remove("d-none");
+    });
+
+    retakeBtn.addEventListener("click", () => {
+        canvas.classList.add("d-none");
+        video.classList.remove("d-none");
+
+        captureBtn.classList.remove("d-none");
+        retakeBtn.classList.add("d-none");
+        usePhotoBtn.classList.add("d-none");
+    });
+
+    usePhotoBtn.addEventListener("click", () => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "camera-photo.jpg", { type: "image/jpeg" });
+
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+
+            cameraPreview.src = URL.createObjectURL(blob);
+            cameraPreview.classList.remove("d-none");
+
+            const modal = bootstrap.Modal.getInstance(cameraModal);
+            if (modal) modal.hide();
+
+        }, "image/jpeg", 0.9);
+    });
+
+    cameraModal.addEventListener("shown.bs.modal", () => {
+        // Reset UI
+        video.classList.remove("d-none");
+        canvas.classList.add("d-none");
+        captureBtn.classList.remove("d-none");
+        retakeBtn.classList.add("d-none");
+        usePhotoBtn.classList.add("d-none");
+
+        startCamera();
+    });
+
+    cameraModal.addEventListener("hidden.bs.modal", () => {
+        stopCamera();
+    });
 });
 
 // AJAX submit that maps visible UI values to backend-expected keys
@@ -1604,10 +2061,17 @@ async function submitCatchFormAjax(form) {
         
         // Validate boat entries first
         const boatErrors = validateBoatEntries();
-        if (boatErrors) {
-            showServerErrors(boatErrors);
+        Object.assign(errors, boatErrors);
+        
+        // Validate fishing operation entries
+        const fishingOpErrors = validateFishingOpEntries();
+        Object.assign(errors, fishingOpErrors);
+        
+        // If there are errors, show them and stop form submission
+        if (Object.keys(errors).length > 0) {
+            showServerErrors(errors);
             if (submitBtn) submitBtn.disabled = false;
-            return;
+            return false;
         }
         
         // Create FormData from the form directly
@@ -1694,14 +2158,178 @@ async function submitCatchFormAjax(form) {
     }
 </style>
 
-<!-- Your existing content -->
-<div id="map"></div>
-
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
+
+<!-- Fishing Location Map Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Check if map container exists
+    const mapElement = document.getElementById('fishing-location-map');
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const locationInput = document.getElementById('fishing_location');
+    const searchInput = document.getElementById('fishing-location-search');
+    const searchButton = document.getElementById('search-location-btn');
+    
+    if (!mapElement) {
+        console.error('Fishing location map container not found');
+        return;
+    }
+    
+    try {
+        // Set initial coordinates from input fields or default to Philippines
+        let initialLat = parseFloat(latInput?.value) || 12.8797;
+        let initialLng = parseFloat(lngInput?.value) || 121.7740;
+        let map, marker, geocoder;
+        
+        // Initialize the map
+        function initMap() {
+            map = L.map('fishing-location-map').setView([initialLat, initialLng], 10);
+            
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 19,
+            }).addTo(map);
+            
+            // Add scale control
+            L.control.scale({
+                imperial: false,
+                metric: true,
+                position: 'bottomright'
+            }).addTo(map);
+            
+            // Create a marker with initial position
+            marker = L.marker([initialLat, initialLng], {
+                draggable: true,
+                title: 'Drag to adjust location'
+            }).addTo(map);
+            
+            // Initialize geocoder
+            initGeocoder();
+            
+            // Update form fields when marker is dragged
+            marker.on('dragend', function(e) {
+                const newLat = marker.getLatLng().lat;
+                const newLng = marker.getLatLng().lng;
+                updateFormFields(newLat, newLng);
+            });
+            
+            // Handle map click to move marker
+            map.on('click', function(e) {
+                marker.setLatLng(e.latlng);
+                updateFormFields(e.latlng.lat, e.latlng.lng);
+            });
+        }
+        
+        // Initialize geocoder for search functionality
+        function initGeocoder() {
+            // Handle search button click
+            if (searchButton && searchInput) {
+                searchButton.addEventListener('click', function() {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        searchLocation(query);
+                    }
+                });
+                
+                // Allow search on Enter key
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const query = searchInput.value.trim();
+                        if (query) {
+                            searchLocation(query);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Search for a location using Nominatim
+        function searchLocation(query) {
+            if (!query) return;
+            
+            // Show loading state
+            const originalButtonText = searchButton.innerHTML;
+            searchButton.disabled = true;
+            searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+            
+            // Use Nominatim for geocoding
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const result = data[0];
+                        const lat = parseFloat(result.lat);
+                        const lng = parseFloat(result.lon);
+                        
+                        // Update map view and marker
+                        map.setView([lat, lng], 15);
+                        marker.setLatLng([lat, lng]);
+                        updateFormFields(lat, lng);
+                        
+                        // Update search input with formatted address
+                        searchInput.value = result.display_name.split(',', 2).join(','); // Show first two parts of address
+                    } else {
+                        alert('Location not found. Please try a different search term.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Geocoding error:', error);
+                    alert('Error searching for location. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    searchButton.disabled = false;
+                    searchButton.innerHTML = originalButtonText;
+                });
+        }
+        
+        // Function to update form fields
+        function updateFormFields(lat, lng) {
+            if (latInput) latInput.value = lat.toFixed(6);
+            if (lngInput) lngInput.value = lng.toFixed(6);
+            if (locationInput) locationInput.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+        }
+        
+        // Update marker position when input fields change
+        if (latInput && lngInput) {
+            const updateMarkerFromInputs = () => {
+                const lat = parseFloat(latInput.value);
+                const lng = parseFloat(lngInput.value);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const newLatLng = L.latLng(lat, lng);
+                    if (marker) marker.setLatLng(newLatLng);
+                    if (map) map.panTo(newLatLng);
+                }
+            };
+            
+            latInput.addEventListener('change', updateMarkerFromInputs);
+            lngInput.addEventListener('change', updateMarkerFromInputs);
+        }
+        
+        // Initialize the map
+        initMap();
+        
+    } catch (error) {
+        console.error('Error initializing fishing location map:', error);
+        if (mapElement) {
+            mapElement.innerHTML = `
+                <div class="alert alert-danger m-3">
+                    <i class="bx bx-error"></i> Failed to load map. Please check your internet connection and refresh the page.
+                    <div class="mt-2">${error.message}</div>
+                </div>`;
+        }
+    }
+});
+</script>
+
+<!-- jQuery (required for some plugins) -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -1811,24 +2439,298 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to initialize map for boat entry
 function initMapForBoat(boatElement, index) {
-    const mapContainer = boatElement.querySelector('.map-container');
+    // Get the map container
+    const mapContainer = boatElement.querySelector(`#map-${index}`) || boatElement.querySelector('.map-container');
     if (!mapContainer) return;
     
-    // Create a unique ID for the map container
-    const mapId = 'map-' + index + '-' + Date.now();
+    // Set a unique ID for the map container if it doesn't have one
+    const mapId = mapContainer.id || `map-${index}-${Date.now()}`;
     mapContainer.id = mapId;
     
-    // Initialize the map
-    const map = L.map(mapId).setView([12.8797, 121.7740], 10);
+    // Get the search input and button
+    const searchInput = boatElement.querySelector(`#search-location-${index}`);
+    const searchButton = boatElement.querySelector(`#search-button-${index}`);
+    
+            // Initialize the map
+    const map = L.map(mapId, {
+        center: [12.8797, 121.7740],
+        zoom: 10
+    });
     
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
     
+    // Initialize geocoder control after map is ready
+    function initGeocoder() {
+        try {
+            // Check if Leaflet is loaded
+            if (typeof L === 'undefined') {
+                console.error('Leaflet is not loaded');
+                return null;
+            }
+
+            // Check if map is initialized
+            if (!map || typeof map.addControl !== 'function') {
+                console.error('Map is not properly initialized');
+                return null;
+            }
+            
+            // Check if geocoder control is already added
+            if (map._geocoderControl) {
+                console.log('Geocoder control already initialized');
+                return map._geocoderControl;
+            }
+            
+            // Create a custom geocoder control
+            const geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                position: 'topright',
+                placeholder: 'Search location...',
+                errorMessage: 'Location not found.',
+                showResultIcons: true,
+                collapsed: false
+            });
+            
+            // Add the geocoder to the custom container
+            const geocoderContainer = document.getElementById(`geocoder-container-${index}`);
+            if (geocoderContainer) {
+                geocoder.onAdd = function() {
+                    const div = L.DomUtil.create('div', 'leaflet-control-geocoder leaflet-bar');
+                    const form = L.DomUtil.create('form', 'd-flex', div);
+                    const input = L.DomUtil.create('input', 'form-control', form);
+                    input.type = 'text';
+                    input.placeholder = 'Search location...';
+                    
+                    const button = L.DomUtil.create('button', 'btn btn-primary ms-1', form);
+                    button.type = 'submit';
+                    button.innerHTML = '<i class="bx bx-search"></i>';
+                    
+                    L.DomEvent.on(form, 'submit', function(e) {
+                        e.preventDefault();
+                        const query = input.value.trim();
+                        if (query) {
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data && data.length > 0) {
+                                        const result = data[0];
+                                        const lat = parseFloat(result.lat);
+                                        const lng = parseFloat(result.lon);
+                                        map.setView([lat, lng], 15);
+                                        
+                                        // Update the coordinates in the form
+                                        const latInput = boatElement.querySelector('.latitude');
+                                        const lngInput = boatElement.querySelector('.longitude');
+                                        if (latInput) latInput.value = lat;
+                                        if (lngInput) lngInput.value = lng;
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Geocoding error:', error);
+                                });
+                        }
+                    });
+                    
+                    return div;
+                };
+                
+                // Add the geocoder to the map
+                geocoder.addTo(map);
+                
+                // Store reference to remove later if needed
+                map._geocoderControl = geocoder;
+                
+                return geocoder;
+            }
+
+            console.log('Initializing geocoder...');
+            
+            try {
+                // Create geocoder control with error handling
+                const geocoder = L.Control.Geocoder.nominatim();
+                if (!geocoder) throw new Error('Failed to create geocoder instance');
+                
+                // Create a container for the geocoder control
+                const geocoderContainer = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+                
+                // Create the search control
+                const searchControl = L.Control.geocoder({
+                    defaultMarkGeocode: false,
+                    placeholder: 'Search location...',
+                    errorMessage: 'Location not found.',
+                    position: 'topright',
+                    collapsed: false,
+                    geocoder: geocoder
+                });
+                
+                // Add control to map
+                searchControl.addTo(map);
+                
+                // Ensure the control is visible
+                const geocoderInput = map.getContainer().querySelector('.leaflet-control-geocoder-form input[type="text"]');
+                if (geocoderInput) {
+                    geocoderInput.style.width = '200px';
+                    geocoderInput.style.height = '30px';
+                }
+                
+                // Add custom CSS for the geocoder
+                const style = document.createElement('style');
+                style.textContent = `
+                    .leaflet-control-geocoder {
+                        box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+                        background: #fff;
+                        border-radius: 4px;
+                    }
+                    .leaflet-control-geocoder a {
+                        background-color: #fff;
+                        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+                        background-repeat: no-repeat;
+                        background-position: 8px 8px;
+                        width: 30px;
+                        height: 30px;
+                        display: block;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                // Handle geocoding results
+                searchControl.on('markgeocode', function(e) {
+                    try {
+                        const center = e.geocode.center;
+                        const lat = parseFloat(center.lat).toFixed(6);
+                        const lng = parseFloat(center.lng).toFixed(6);
+                        
+                        console.log('Geocoder result:', e.geocode);
+                        
+                        // Update the input fields
+                        if (latInput) latInput.value = lat;
+                        if (lngInput) lngInput.value = lng;
+                        
+                        // Update the marker
+                        updateMarker(parseFloat(lat), parseFloat(lng));
+                        
+                        // Center the map with padding
+                        if (e.geocode.bbox) {
+                            map.fitBounds([
+                                [e.geocode.bbox[0][0], e.geocode.bbox[0][1]],
+                                [e.geocode.bbox[1][0], e.geocode.bbox[1][1]]
+                            ], { padding: [50, 50] });
+                        } else {
+                            map.setView([center.lat, center.lng], 15);
+                        }
+                    } catch (err) {
+                        console.error('Error handling geocode result:', err);
+                    }
+                });
+                
+                console.log('Geocoder initialized successfully');
+                return searchControl;
+                
+            } catch (err) {
+                console.error('Failed to initialize geocoder control:', err);
+                console.warn('Falling back to simple coordinate input');
+                return null;
+            }
+            
+        } catch (error) {
+            console.error('Error in initGeocoder:', error);
+            return null;
+        }
+    }
+    
+    // Initialize geocoder when map is ready
+    let geocoderInitialized = false;
+    
+    // Add search functionality
+    if (searchInput && searchButton) {
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            // Show loading state
+            searchButton.disabled = true;
+            searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+            
+            // Use Nominatim for geocoding
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const result = data[0];
+                        const lat = parseFloat(result.lat);
+                        const lng = parseFloat(result.lon);
+                        
+                        // Center the map on the found location
+                        map.setView([lat, lng], 15);
+                        
+                        // Add a marker at the location
+                        if (window.boatMarkers && window.boatMarkers[index]) {
+                            map.removeLayer(window.boatMarkers[index]);
+                        }
+                        
+                        const marker = L.marker([lat, lng]).addTo(map);
+                        if (!window.boatMarkers) window.boatMarkers = {};
+                        window.boatMarkers[index] = marker;
+                        
+                        // Update the coordinates in the form
+                        const latInput = boatElement.querySelector('.latitude');
+                        const lngInput = boatElement.querySelector('.longitude');
+                        if (latInput) latInput.value = lat;
+                        if (lngInput) lngInput.value = lng;
+                    } else {
+                        alert('Location not found. Please try a different search term.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    alert('Error searching for location. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    searchButton.disabled = false;
+                    searchButton.innerHTML = '<i class="bx bx-search"></i> Search';
+                });
+        };
+        
+        // Add event listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+    }
+    
+    function initGeocoderWhenReady() {
+        if (geocoderInitialized) return;
+        
+        if (window.L && window.L.Control && window.L.Control.Geocoder) {
+            const geocoder = initGeocoder();
+            if (geocoder) {
+                geocoderInitialized = true;
+                return;
+            }
+        }
+        
+        // Try again after a short delay
+        if (!geocoderInitialized) {
+            setTimeout(initGeocoderWhenReady, 200);
+        }
+    }
+    
+    // Start geocoder initialization
+    setTimeout(initGeocoderWhenReady, 1000);
+    
     // Get the latitude and longitude inputs for this boat
     const latInput = boatElement.querySelector('.latitude');
     const lngInput = boatElement.querySelector('.longitude');
+    
+    // Initialize with default values if inputs are empty
+    let currentLat = latInput && latInput.value ? parseFloat(latInput.value) : 12.8797;
+    let currentLng = lngInput && lngInput.value ? parseFloat(lngInput.value) : 121.7740;
     
     // Add a marker
     let marker = null;
@@ -1862,8 +2764,8 @@ function initMapForBoat(boatElement, index) {
     };
     
     // Update inputs when marker is dragged
-    latInput.addEventListener('change', updateFromInputs);
-    lngInput.addEventListener('change', updateFromInputs);
+    if (latInput) latInput.addEventListener('change', updateFromInputs);
+    if (lngInput) lngInput.addEventListener('change', updateFromInputs);
     
     // Update marker on map click
     map.on('click', function(e) {
@@ -2136,7 +3038,7 @@ function initFishingOpMap(container, index) {
 
 // Function to update fishing operation numbers
 function updateFishingOpNumbers() {
-    const opEntries = document.querySelectorAll('.fishing-op-entry');
+    const opEntries = document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
     opEntries.forEach((entry, index) => {
         const numberSpan = entry.querySelector('.entry-number');
         if (numberSpan) {
@@ -2164,143 +3066,144 @@ function updateFishingOpNumbers() {
             }
         });
     });
+    
     return opEntries.length - 1;
 }
 
-// Add Fishing Operation Functionality
+// Initialize fishing operation entry
+// Initialize fishing operation entries when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    const addFishingOpBtn = document.getElementById('addFishingOpBtn');
-    const fishingOpContainer = document.getElementById('fishingOpContainer');
-    const fishingOpTemplate = document.querySelector('.fishing-op-entry[style*="display: none"]');
-    let fishingOpCount = 0;
-    
-    // Initialize maps for any existing fishing operation entries
-    document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').forEach((entry, index) => {
-        initFishingOpMap(entry, index);
-        fishingOpCount++;
-    });
-
-    // Show remove button for the first fishing op entry
-    const firstFishingOpEntry = document.querySelector('.fishing-op-entry:not([style*="display: none"])');
-    if (firstFishingOpEntry) {
-        const firstRemoveBtn = firstFishingOpEntry.querySelector('.remove-fishing-op');
-        if (firstRemoveBtn) {
-            firstRemoveBtn.style.display = 'inline-block';
-            firstRemoveBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (document.querySelectorAll('.fishing-op-entry').length > 1) {
-                    this.closest('.fishing-op-entry').remove();
-                    updateFishingOpNumbers();
-                }
-            });
+    try {
+        // Initialize the first fishing operation entry
+        const firstEntry = document.querySelector('.fishing-op-entry:not([style*="display: none"])');
+        if (firstEntry) {
+            // Hide the remove button since there's only one entry
+            const removeBtn = firstEntry.querySelector('.remove-fishing-op');
+            if (removeBtn) {
+                removeBtn.style.display = 'none';
+            }
         }
-        
-        // Initialize map for the first entry
-        initFishingOpMap(firstFishingOpEntry, 0);
-        
-        // Set initial fishing op count
-        fishingOpCount = document.querySelectorAll('.fishing-op-entry').length - 1;
+    } catch (error) {
+        console.error('Error initializing fishing operation entries:', error);
+    }
+});
+
+// Boat Information Autofill Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Debounce function to limit API calls
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
     }
 
-    if (addFishingOpBtn && fishingOpTemplate) {
-        addFishingOpBtn.addEventListener('click', function() {
-            fishingOpCount++;
-
-            // Clone the hidden template
-            const newOp = fishingOpTemplate.cloneNode(true);
-            newOp.style.display = 'block';
-
-            // Update all input names and IDs for the new fishing op
-            newOp.querySelectorAll('input, select, textarea, label').forEach((element) => {
-                // Update input/select/textarea elements
-                if (element.name) {
-                    element.name = element.name.replace(/\[\d+\]/g, `[${fishingOpCount}]`);
+    // Function to handle boat name input and fetch boat data
+    function setupBoatAutofill() {
+        const boatEntries = document.querySelectorAll('.boat-entry:not([style*="display: none"])');
+        
+        boatEntries.forEach((boatEntry, index) => {
+            const boatNameInput = boatEntry.querySelector('input[name$="[boat_name]"]');
+            
+            if (boatNameInput && !boatNameInput.hasAttribute('data-autofill-listener')) {
+                // Mark this input as having a listener to avoid duplicates
+                boatNameInput.setAttribute('data-autofill-listener', 'true');
+                
+                // Add debounced input event listener
+                boatNameInput.addEventListener('input', debounce(async function(e) {
+                    const query = this.value.trim();
                     
-                    // Clear the value for the new entry
-                    if (element.type !== 'radio' && element.type !== 'checkbox' && !element.readOnly) {
-                        element.value = '';
-                    } else if (element.type === 'radio' || element.type === 'checkbox') {
-                        // Uncheck all radio buttons in the new entry
-                        if (element.type === 'radio') {
-                            element.checked = false;
+                    // Don't search if query is too short
+                    if (query.length < 2) return;
+                    
+                    try {
+                        const response = await fetch(`/boats/search?query=${encodeURIComponent(query)}`);
+                        const data = await response.json();
+                        
+                        if (data.status === 'found' && data.data) {
+                            const boat = data.data;
+                            const entryIndex = this.name.match(/\d+/)[0]; // Get the index from the input name
+                            
+                            // Update the boat type radio buttons
+                            const boatTypeInput = boatEntry.querySelector(`input[name="boats[${entryIndex}][boat_type]"][value="${boat.boat_type}"]`);
+                            if (boatTypeInput) boatTypeInput.checked = true;
+                            
+                            // Update other fields
+                            setInputValue(boatEntry, `boats[${entryIndex}][boat_length]`, boat.boat_length);
+                            setInputValue(boatEntry, `boats[${entryIndex}][boat_width]`, boat.boat_width);
+                            setInputValue(boatEntry, `boats[${entryIndex}][boat_depth]`, boat.boat_depth);
+                            setInputValue(boatEntry, `boats[${entryIndex}][gross_tonnage]`, boat.gross_tonnage);
+                            setInputValue(boatEntry, `boats[${entryIndex}][horsepower]`, boat.horsepower);
+                            setInputValue(boatEntry, `boats[${entryIndex}][engine_type]`, boat.engine_type);
+                            setInputValue(boatEntry, `boats[${entryIndex}][fishermen_count]`, boat.fishermen_count);
+                            
+                            // Show success message
+                            showToast('Boat information loaded successfully!', 'success');
                         }
+                    } catch (error) {
+                        console.error('Error fetching boat data:', error);
+                        showToast('Error fetching boat information', 'error');
                     }
-                }
-                
-                // Update IDs and for attributes
-                if (element.id) {
-                    const newId = element.id.replace(/\d+$/, fishingOpCount);
-                    element.id = newId;
-                    
-                    // Update 'for' attributes in labels
-                    if (element.tagName === 'LABEL' && element.htmlFor) {
-                        element.htmlFor = newId;
-                    }
-                }
-            });
-
-            // Set default radio button to "No"
-            const noRadio = newOp.querySelector(`input[type="radio"][value="No"]`);
-            if (noRadio) {
-                noRadio.checked = true;
+                }, 300)); // 300ms debounce delay
             }
-
-            // Update entry number
-            const entryNumber = newOp.querySelector('.entry-number');
-            if (entryNumber) {
-                entryNumber.textContent = fishingOpCount + 1;
-            }
-
-            // Add remove event
-            const removeBtn = newOp.querySelector('.remove-fishing-op');
-            if (removeBtn) {
-                removeBtn.style.display = 'inline-block';
-                removeBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (document.querySelectorAll('.fishing-op-entry').length > 1) {
-                        newOp.remove();
-                        updateFishingOpNumbers();
-                    }
-                });
-            }
-
-                        // Find the last fishing operation entry
-            const lastOp = document.querySelector('.fishing-op-entry:not([style*="display: none"]:last-child)');
-            
-            if (lastOp) {
-                // Insert the new operation after the last one
-                lastOp.parentNode.insertBefore(newOp, lastOp.nextSibling);
-            } else {
-                // If no operations exist yet, append to container
-                fishingOpContainer.appendChild(newOp);
-            }
-            
-            // Initialize map for the new fishing operation entry
-            initFishingOpMap(newOp, fishingOpCount);
-            
-            // Update fishing operation numbers
-            fishingOpCount = updateFishingOpNumbers();
-            
-            // Set default values for new operation
-            const latInput = newOp.querySelector('input[name$="[latitude]"]');
-            const lngInput = newOp.querySelector('input[name$="[longitude]"]');
-            const locationInput = newOp.querySelector('input[name$="[fishing_location]"]');
-            
-            if (latInput && lngInput && locationInput) {
-                // Set default coordinates (Philippines center)
-                latInput.value = '12.8797';
-                lngInput.value = '121.7740';
-                locationInput.value = '12.8797, 121.7740';
-                
-                // Trigger map update
-                const mapContainer = newOp.querySelector('.map-container');
-                if (mapContainer && mapContainer._map) {
-                    mapContainer._map.setView([12.8797, 121.7740], 6);
-                }
-            }
-            
-            // Scroll to the new operation
-            newOp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    }
+    
+    // Helper function to set input values
+    function setInputValue(container, name, value) {
+        const input = container.querySelector(`[name="${name}"]`);
+        if (input) {
+            input.value = value || '';
+            // Trigger any necessary events (like for gross tonnage calculation)
+            if (input.oninput) input.oninput();
+        }
+    }
+    
+    // Show toast notification
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bx ${type === 'success' ? 'bx-check-circle' : 'bx-error'}"></i> ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        // Remove toast after it's hidden
+        toast.addEventListener('hidden.bs.toast', function() {
+            document.body.removeChild(toast);
+        });
+    }
+    
+    // Initialize autofill for existing boat entries
+    setupBoatAutofill();
+    
+    // Set up a mutation observer to handle dynamically added boat entries
+    const boatInfoContainer = document.getElementById('boatInfoContainer');
+    if (boatInfoContainer) {
+        const observer = new MutationObserver(function(mutations) {
+            setupBoatAutofill();
+        });
+        
+        observer.observe(boatInfoContainer, {
+            childList: true,
+            subtree: true
         });
     }
 });
@@ -2522,6 +3425,474 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 
+// Camera functionality
+function initializeCamera() {
+    // DOM Elements
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const captureBtn = document.getElementById('captureBtn');
+    const switchCameraBtn = document.getElementById('switchCameraBtn');
+    const usePhotoBtn = document.getElementById('usePhotoBtn');
+    const cameraPreview = document.getElementById('cameraPreview');
+    const fileInput = document.getElementById('image');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const cameraContainer = document.getElementById('cameraContainer');
+    
+    // Camera state
+    let currentFacingMode = 'environment'; // Start with back camera
+    let stream = null;
+    let isCaptured = false;
+
+    // Toggle camera visibility and connection
+    async function toggleCamera(show) {
+        if (show) {
+            cameraContainer.classList.remove('d-none');
+            await connectCamera();
+            cameraBtn.innerHTML = '<i class="bx bx-x me-1"></i>Close Camera';
+            cameraBtn.classList.remove('btn-primary');
+            cameraBtn.classList.add('btn-danger');
+        } else {
+            disconnectCamera();
+            cameraContainer.classList.add('d-none');
+            cameraBtn.innerHTML = '<i class="bx bx-camera me-1"></i>Open Camera';
+            cameraBtn.classList.remove('btn-danger');
+            cameraBtn.classList.add('btn-primary');
+        }
+    }
+
+    // Connect to camera
+    async function connectCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            alert('Camera access is not supported in this browser.');
+            return;
+        }
+
+        try {
+            // Stop any existing stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // Get video stream
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: currentFacingMode,
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+
+            // Set video source
+            video.srcObject = stream;
+            await video.play();
+            
+            // Reset UI
+            video.classList.remove('d-none');
+            canvas.classList.add('d-none');
+            captureBtn.classList.remove('d-none');
+            usePhotoBtn.classList.add('d-none');
+            isCaptured = false;
+
+        } catch (err) {
+            console.error('Camera error:', err);
+            alert('Unable to access camera. Please check permissions and try again.');
+            cameraContainer.classList.add('d-none');
+            cameraBtn.innerHTML = '<i class="bx bx-camera me-1"></i>Open Camera';
+            cameraBtn.classList.remove('btn-danger');
+            cameraBtn.classList.add('btn-primary');
+        }
+    }
+
+    // Disconnect camera
+    function disconnectCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        if (video.srcObject) {
+            video.srcObject = null;
+        }
+    }
+
+    // Capture photo
+    function capturePhoto() {
+        if (!stream) return;
+
+        try {
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw video frame to canvas
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Update UI
+            video.classList.add('d-none');
+            canvas.classList.remove('d-none');
+            captureBtn.classList.add('d-none');
+            usePhotoBtn.classList.remove('d-none');
+            isCaptured = true;
+
+        } catch (err) {
+            console.error('Error capturing photo:', err);
+            alert('Failed to capture photo. Please try again.');
+        }
+    }
+
+    // Use the captured photo
+    function usePhoto() {
+        if (!isCaptured) return;
+
+        try {
+            // Convert canvas to blob
+            canvas.toBlob((blob) => {
+                // Create a file from the blob
+                const file = new File([blob], 'fish-photo.jpg', { type: 'image/jpeg' });
+                
+                // Create a new FileList and DataTransfer
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                
+                // Update file input
+                fileInput.files = dataTransfer.files;
+                
+                // Show preview
+                cameraPreview.src = URL.createObjectURL(blob);
+                cameraPreview.classList.remove('d-none');
+                
+                // Close camera
+                toggleCamera(false);
+            }, 'image/jpeg', 0.9);
+
+        } catch (err) {
+            console.error('Error using photo:', err);
+            alert('Failed to process photo. Please try again.');
+        }
+    }
+
+    // Switch between front and back camera
+    async function switchCamera() {
+        currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+        await connectCamera();
+    }
+
+    // Initialize event listeners
+    function setupEventListeners() {
+        // Add event listener for camera button
+        if (cameraBtn) {
+            cameraBtn.addEventListener('click', function() {
+                const isCameraVisible = !cameraContainer.classList.contains('d-none');
+                if (!isCameraVisible) {
+                    // Only update button text when opening the camera
+                    cameraBtn.innerHTML = '<i class="bx bx-camera me-1"></i>Open Camera';
+                    toggleCamera(true);
+                }
+            });
+        }
+        
+        // Add event listener for close camera button
+        const closeCameraBtn = document.getElementById('closeCameraBtn');
+        if (closeCameraBtn) {
+            closeCameraBtn.addEventListener('click', function() {
+                stopCamera();
+                cameraContainer.classList.add('d-none');
+                cameraBtn.innerHTML = '<i class="bx bx-camera me-1"></i>Open Camera';
+            });
+        }
+        
+        // Capture button
+        captureBtn?.addEventListener('click', capturePhoto);
+
+        // Switch camera button
+        switchCameraBtn?.addEventListener('click', switchCamera);
+
+        // Use photo button
+        usePhotoBtn?.addEventListener('click', usePhoto);
+
+        // Clean up camera when page is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && stream) {
+                disconnectCamera();
+            }
+        });
+    }
+
+    // Initialize the camera functionality
+    setupEventListeners();
+}
+
+// Initialize fishing location map
+function initFishingLocationMap() {
+    const mapElement = document.getElementById('fishing-location-map');
+    const searchInput = document.getElementById('fishing-location-search');
+    const searchButton = document.getElementById('search-location-btn');
+    const latInput = document.querySelector('input[name$="[latitude]"]');
+    const lngInput = document.querySelector('input[name$="[longitude]"]');
+    
+    if (!mapElement) return;
+    
+    // Initialize the map
+    const map = L.map('fishing-location-map').setView([12.8797, 121.7740], 10);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+    // Add a marker
+    const marker = L.marker([12.8797, 121.7740], {
+        draggable: true
+    }).addTo(map);
+    
+    // Update marker position and input fields when marker is dragged
+    marker.on('dragend', function(e) {
+        const latLng = marker.getLatLng();
+        updateInputs(latLng.lat, latLng.lng);
+    });
+    
+    // Update marker position when map is clicked
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateInputs(e.latlng.lat, e.latlng.lng);
+    });
+    
+    // Update marker and map view when inputs change
+    if (latInput && lngInput) {
+        const updateMarkerFromInputs = () => {
+            const lat = parseFloat(latInput.value) || 12.8797;
+            const lng = parseFloat(lngInput.value) || 121.7740;
+            const newLatLng = L.latLng(lat, lng);
+            marker.setLatLng(newLatLng);
+            map.setView(newLatLng, 13);
+        };
+        
+        latInput.addEventListener('change', updateMarkerFromInputs);
+        lngInput.addEventListener('change', updateMarkerFromInputs);
+    }
+    
+    // Handle search functionality
+    if (searchInput && searchButton) {
+        const performSearch = () => {
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            // Show loading state
+            const originalButtonText = searchButton.innerHTML;
+            searchButton.disabled = true;
+            searchButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Searching...';
+            
+            // Use Nominatim for geocoding
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const result = data[0];
+                        const lat = parseFloat(result.lat);
+                        const lng = parseFloat(result.lon);
+                        
+                        // Update marker and map view
+                        const newLatLng = L.latLng(lat, lng);
+                        marker.setLatLng(newLatLng);
+                        map.setView(newLatLng, 15);
+                        
+                        // Update input fields
+                        updateInputs(lat, lng);
+                    } else {
+                        alert('Location not found. Please try a different search term.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    alert('Error searching for location. Please try again.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    searchButton.disabled = false;
+                    searchButton.innerHTML = originalButtonText;
+                });
+        };
+        
+        // Add event listeners for search
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+    }
+    
+    // Helper function to update input fields
+    function updateInputs(lat, lng) {
+        if (latInput) latInput.value = lat.toFixed(6);
+        if (lngInput) lngInput.value = lng.toFixed(6);
+    }
+    
+    return map;
+}
+
+// Initialize camera when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize fishing location map
+    initFishingLocationMap();
+    
+    // Handle adding new fishing operation entries
+    const addFishingOpBtn = document.getElementById('addFishingOpBtn');
+    const fishingOpContainer = document.getElementById('fishingOpContainer');
+    
+    if (addFishingOpBtn && fishingOpContainer) {
+        addFishingOpBtn.addEventListener('click', function() {
+            // Get the template
+            const template = document.querySelector('.fishing-op-entry[style*="display: none"]');
+            if (!template) return;
+            
+            // Clone the template
+            const newEntry = template.cloneNode(true);
+            newEntry.style.display = '';
+            
+            // Update the entry number
+            const entryNumber = document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])').length;
+            const numberSpan = newEntry.querySelector('.entry-number');
+            if (numberSpan) {
+                numberSpan.textContent = entryNumber + 1;
+            }
+            
+            // Update input names with new index
+            const inputs = newEntry.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/fishing_ops\[\d+\]/g, `fishing_ops[${entryNumber}]`);
+                    
+                    // Clear the value for new entries
+                    if (input.type !== 'hidden') {
+                        input.value = '';
+                    }
+                    
+                    // Update IDs for radio buttons and their labels
+                    if (input.type === 'radio' || input.type === 'checkbox') {
+                        const oldId = input.id;
+                        if (oldId) {
+                            const newId = oldId.replace(/\d+$/, entryNumber);
+                            input.id = newId;
+                            
+                            // Update corresponding label
+                            const label = newEntry.querySelector(`label[for="${oldId}"]`);
+                            if (label) {
+                                label.htmlFor = newId;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Show the remove button for all entries except the first one
+            const removeBtns = document.querySelectorAll('.remove-fishing-op');
+            if (removeBtns.length > 0) {
+                removeBtns.forEach(btn => {
+                    btn.style.display = 'block';
+                });
+            }
+            
+            // Insert the new entry before the add button
+            const addButtonContainer = document.querySelector('#fishingOpContainer > .text-end');
+            if (addButtonContainer) {
+                fishingOpContainer.insertBefore(newEntry, addButtonContainer);
+            } else {
+                fishingOpContainer.appendChild(newEntry);
+            }
+            
+            // Initialize map for the new entry if needed
+            const mapContainer = newEntry.querySelector('.map-container');
+            if (mapContainer && typeof initFishingLocationMap === 'function') {
+                // Add a unique ID to the map container
+                const mapId = 'fishing-location-map-' + Date.now();
+                mapContainer.id = mapId;
+                
+                // Initialize the map
+                initFishingLocationMap();
+            }
+            
+            // Update entry numbers
+            updateFishingOpNumbers();
+        });
+    }
+    
+    // Handle removing fishing operation entries
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-fishing-op')) {
+            const entry = e.target.closest('.fishing-op-entry');
+            if (entry) {
+                entry.remove();
+                updateFishingOpNumbers();
+                
+                // Hide remove button if only one entry remains
+                const entries = document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
+                if (entries.length <= 1) {
+                    const removeBtns = document.querySelectorAll('.remove-fishing-op');
+                    removeBtns.forEach(btn => {
+                        btn.style.display = 'none';
+                    });
+                }
+            }
+        }
+    });
+    
+    // Update fishing operation numbers
+    function updateFishingOpNumbers() {
+        const entries = document.querySelectorAll('.fishing-op-entry:not([style*="display: none"])');
+        entries.forEach((entry, index) => {
+            const numberSpan = entry.querySelector('.entry-number');
+            if (numberSpan) {
+                numberSpan.textContent = index + 1;
+            }
+            
+            // Update input names with new indices
+            const inputs = entry.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/fishing_ops\[\d+\]/g, `fishing_ops[${index}]`);
+                }
+            });
+        });
+    }
+    
+    try {
+        // Check if camera elements exist before initializing
+        const cameraBtn = document.getElementById('cameraBtn');
+        const cameraModal = document.getElementById('cameraModal');
+        
+        if (!cameraBtn || !cameraModal) {
+            console.log('Camera elements not found, skipping camera initialization');
+            return;
+        }
+        
+        // Only initialize camera when the modal is shown
+        cameraModal.addEventListener('show.bs.modal', function() {
+            try {
+                initializeCamera();
+            } catch (error) {
+                console.error('Error initializing camera:', error);
+                // Show error to user
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger mt-3';
+                errorDiv.textContent = 'Failed to initialize camera. Please check your browser permissions and try again.';
+                cameraModal.querySelector('.modal-body').prepend(errorDiv);
+            }
+        });
+        
+        // Clean up camera when modal is hidden
+        cameraModal.addEventListener('hidden.bs.modal', function() {
+            if (window.cameraStream) {
+                window.cameraStream.getTracks().forEach(track => track.stop());
+                window.cameraStream = null;
+            }
+        });
+    } catch (error) {
+        console.error('Error setting up camera event listeners:', error);
+    }
+});
+
 // Function to calculate Gross Tonnage based on boat dimensions
 function calculateGrossTonnage(input) {
     // Debug log to check if function is called
@@ -2561,3 +3932,4 @@ function calculateGrossTonnage(input) {
 }
 </script>
 @endsection
+

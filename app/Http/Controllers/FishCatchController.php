@@ -24,6 +24,40 @@ class FishCatchController extends Controller
             
         return view('catches.index', compact('catches'));
     }
+    
+    /**
+     * Display all catches for admin
+     */
+    public function adminIndex()
+    {
+        $catches = FishCatch::with([
+                'user', 
+                'boats', 
+                'fishingOperations',
+                'user.role' // Load user's role relationship
+            ])
+            ->withCount('boats')
+            ->withCount('fishingOperations')
+            ->orderBy('created_at', 'desc')
+            ->paginate(25);
+            
+        // Get all available columns from the database
+        $columns = \Schema::getColumnListing((new FishCatch)->getTable());
+        
+        return view('admin.catches', [
+            'catches' => $catches,
+            'columns' => $columns
+        ]);
+    }
+    
+    /**
+     * Display the specified catch for admin
+     */
+    public function adminShow(FishCatch $catch)
+    {
+        $catch->load(['user', 'boats', 'fishingOperations']);
+        return view('admin.view-catch', compact('catch'));
+    }
     private $mlApiUrl = 'http://localhost:5000';
     
     /**

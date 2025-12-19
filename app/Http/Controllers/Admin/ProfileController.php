@@ -39,15 +39,21 @@ class ProfileController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
 
+        // Handle profile image upload
         if ($request->hasFile('profile_image')) {
             // Delete old profile image if exists
-            if ($user->profile_image) {
+            if ($user->profile_image && Storage::exists('public/profile_images/' . $user->profile_image)) {
                 Storage::delete('public/profile_images/' . $user->profile_image);
             }
             
             // Store new profile image
-            $imageName = time() . '_' . $request->file('profile_image')->getClientOriginalName();
-            $request->file('profile_image')->storeAs('public/profile_images', $imageName);
+            $image = $request->file('profile_image');
+            $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+            
+            // Store the file in the public disk
+            $path = $request->file('profile_image')->storeAs('public/profile_images', $imageName);
+            
+            // Update the user's profile image
             $user->profile_image = $imageName;
         }
 

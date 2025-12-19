@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Controllers\FishController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,6 +16,9 @@ use App\Models\User;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+// Fish identification endpoint
+Route::post('/identify', [FishController::class, 'identify']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

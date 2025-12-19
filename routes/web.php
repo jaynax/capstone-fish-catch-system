@@ -7,14 +7,75 @@ use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\FishCatchController;
+use App\Http\Controllers\BoatController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 
 // Include test routes
 require __DIR__.'/oauth-test.php';
 require __DIR__.'/test-oauth.php';
 
-// Protected routes that require authentication
-Route::middleware(['auth'])->group(function () {
+// Pending approval route - accessible to logged-in users with pending status
+Route::middleware(['auth', 'user.status'])->get('/pending-approval', function () {
+    return view('auth.pending-approval');
+})->name('pending-approval');
+
+// Protected routes that require authentication and approved status
+Route::middleware(['auth', 'user.status'])->group(function () {
+    // Admin Dashboard and User Management
+    // Admin routes - Accessible to both ADMIN and REGIONAL_ADMIN roles
+    Route::prefix('admin')->name('admin.')->middleware(['role:ADMIN,REGIONAL_ADMIN'])->group(function () {
+        // Admin Dashboard - Main admin dashboard view
+        Route::get('/dashboard', function () {
+            return view('admin-dashboard');
+        })->name('dashboard');
+        
+        // Admin Catches Management
+        Route::get('/catches', [App\Http\Controllers\FishCatchController::class, 'adminIndex'])->name('catches');
+        Route::get('/catches/{catch}', [App\Http\Controllers\FishCatchController::class, 'adminShow'])->name('catches.show');
+        Route::get('/catches/{catch}/edit', [App\Http\Controllers\FishCatchController::class, 'edit'])->name('catches.edit');
+        
+        // User Management
+        Route::get('/users', function () {
+            $users = \App\Models\User::with('role')->latest()->paginate(10);
+            return view('admin.users', compact('users'));
+        })->name('users.index');
+        
+        // User resource routes
+        Route::prefix('users')->name('users.')->group(function () {
+            // Show user details
+            Route::get('/{user}', [App\Http\Controllers\Admin\UserController::class, 'show'])
+                ->name('show');
+                
+            // Show edit form
+            Route::get('/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])
+                ->name('edit');
+                
+            // Update user
+            Route::put('/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])
+                ->name('update');
+                
+            // Create user
+            Route::post('/', [App\Http\Controllers\Admin\UserController::class, 'store'])
+                ->name('store');
+                
+            // Approve user
+            Route::patch('/{user}/approve', [App\Http\Controllers\Admin\UserController::class, 'approve'])
+                ->name('approve');
+                
+            // Reject user
+            Route::patch('/{user}/reject', [App\Http\Controllers\Admin\UserController::class, 'reject'])
+                ->name('reject');
+                
+            // Delete user
+            Route::delete('/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])
+                ->name('destroy');
+        });
+    });
+
+    // Profile Routes
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/preferences', [App\Http\Controllers\ProfileController::class, 'updatePreferences'])->name('user.profile.preferences');
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     
@@ -25,6 +86,9 @@ Route::middleware(['auth'])->group(function () {
     
     // Fish Catch Routes
     Route::resource('catches', FishCatchController::class)->except(['destroy']);
+    
+    // Boat Search Route
+    Route::get('/boats/search', [BoatController::class, 'search'])->name('boats.search');
     Route::get('/catches/{catch}/pdf', [FishCatchController::class, 'generatePdf'])->name('catches.pdf');
     Route::delete('/catches/{catch}', [FishCatchController::class, 'destroy'])->name('catches.destroy');
     Route::post('/catches/{catch}/analyze', [FishCatchController::class, 'analyzeImage'])->name('catches.analyze');
@@ -67,39 +131,52 @@ Route::post('/register', function (Request $request) {
         return back()->withErrors(['role' => 'Invalid role selected.'])->withInput();
     }
     
+    // Determine if the user should be auto-approved (if they're an admin or regional admin)
+    $status = (in_array($request->role, ['ADMIN', 'REGIONAL_ADMIN'])) ? 'approved' : 'pending';
+    
+    // Create user with appropriate status
     $user = User::create([
         'name' => $request->name,
         'email' => $request->email,
         'password' => Hash::make($request->password),
         'role_id' => $role->id,
+        'status' => $status,
     ]);
     
+    if ($status === 'pending') {
+        // Notify admins about the new registration (only for non-admin users)
+        $admins = User::whereHas('role', function($query) {
+            $query->where('slug', 'ADMIN');
+        })->get();
+        
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\NewUserRegistered($user));
+        }
+    }
+    
+    // Log the user in
     Auth::login($user);
-    return redirect('/dashboard');
+    
+    // Redirect based on user status
+    if ($user->isApproved()) {
+        return redirect()->intended('/dashboard');
+    } else {
+        return redirect()->route('pending-approval');
+    }
 });
 
 // Google OAuth Routes
 Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('login.google');
 Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
-// Login form
+// Authentication Routes
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-// Login handler
-Route::post('/login', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
-    $user = User::where('email', $request->email)->first();
-    if (!$user || !Hash::check($request->password, $user->password)) {
-        return back()->with('error', 'Invalid credentials')->withInput();
-    }
-    Auth::login($user);
-    return redirect('/dashboard');
-});
+// Use the LoginController for authentication
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login'])
+    ->name('login.submit');
 
 // Dashboard redirection based on role
 Route::middleware('auth')->get('/dashboard', function () {
@@ -109,36 +186,48 @@ Route::middleware('auth')->get('/dashboard', function () {
         abort(403, 'User role not found');
     }
     
-    if ($user->role->slug === 'BFAR_PERSONNEL') {
-        return redirect('/dashboard/personnel');
-    } elseif ($user->role->slug === 'REGIONAL_ADMIN') {
-        return redirect('/dashboard/admin');
+    // Redirect admin/regional admin to admin dashboard
+    if (in_array($user->role->slug, ['ADMIN', 'REGIONAL_ADMIN'])) {
+        return redirect()->route('admin.dashboard');
+    }
+    // Redirect BFAR personnel to their dashboard
+    elseif ($user->role->slug === 'BFAR_PERSONNEL') {
+        return view('personnel-dashboard');
     }
     
     abort(403, 'Unauthorized role');
 })->name('dashboard');
 
-// BFAR Personnel dashboard
+// BFAR Personnel dashboard (kept for backward compatibility)
 Route::middleware(['auth', 'role:BFAR_PERSONNEL'])->get('/dashboard/personnel', function () {
     return view('personnel-dashboard');
 })->name('personnel-dashboard');
 
-// Regional Office Admin dashboard
-Route::middleware(['auth', 'role:REGIONAL_ADMIN'])->get('/dashboard/admin', function () {
-    return view('admin-dashboard');
-})->name('admin-dashboard');
-
 // Admin routes for managing data and users
 Route::middleware(['auth', 'role:REGIONAL_ADMIN'])->group(function () {
     Route::get('/admin/catches', function () {
-        $catches = \App\Models\FishCatch::with('user')->orderBy('created_at', 'desc')->get();
+        $catches = \App\Models\FishCatch::with('user')->latest()->paginate(10);
         return view('admin.catches', compact('catches'));
     })->name('admin.catches');
     
+    Route::delete('/admin/catches/{catch}', function (\App\Models\FishCatch $catch) {
+        try {
+            $catch->delete();
+            return response()->json(['success' => true, 'message' => 'Catch record deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Failed to delete catch record'], 500);
+        }
+    })->name('admin.catches.destroy');
+    
+    // List users
     Route::get('/admin/users', function () {
         $users = \App\Models\User::orderBy('created_at', 'desc')->paginate(10);
         return view('admin.users', compact('users'));
     })->name('admin.users');
+    
+    // Delete user
+    Route::delete('/admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])
+        ->name('admin.users.delete');
     
     Route::get('/admin/reports', function () {
         $totalCatches = \App\Models\FishCatch::count();
@@ -173,14 +262,14 @@ Route::middleware('auth')->group(function () {
             $user->profile_image = $imageName;
         }
         $user->save();
-        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Profile updated successfully.');
     })->name('profile.update');
 });
 
 // Admin Profile Routes
-Route::prefix('admin')->middleware(['auth', 'role:REGIONAL_ADMIN'])->group(function () {
-    Route::get('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile.edit');
-    Route::put('/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
+Route::middleware(['auth', 'role:ADMIN|REGIONAL_ADMIN'])->group(function () {
+    Route::get('/admin/profile', [App\Http\Controllers\Admin\ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::put('/admin/profile', [App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('admin.profile.update');
 });
 
 // Login history route (placeholder)
@@ -209,10 +298,9 @@ Route::middleware('auth')->get('/catches/{catch}', [FishCatchController::class, 
 Route::middleware('auth')->get('/catches/{catch}/pdf', [FishCatchController::class, 'generatePdf'])->name('catches.pdf');
 
 // Logout
-Route::post('/logout', function () {
-    Auth::logout();
-    return redirect('/login');
-})->name('logout');
+// Use the LoginController for logout
+Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
+    ->name('logout');
 
 Route::post('/predict', [FishCatchController::class, 'predict'])->name('predict');
 
